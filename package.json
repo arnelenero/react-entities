@@ -1,0 +1,68 @@
+{
+  "name": "react-entities",
+  "version": "0.1.0",
+  "description": "React Entities - the simplest app state management for React",
+  "keywords": [
+    "react",
+    "state",
+    "library",
+    "redux",
+    "functional",
+    "hooks"
+  ],
+  "author": "Arnel Enero <aenero@gmail.com>",
+  "license": "MIT",
+  "main": "lib/index.js",
+  "module": "es/index.js",
+  "files": [
+    "lib",
+    "es",
+    "src"
+  ],
+  "scripts": {
+    "build:lib": "cross-env BABEL_ENV=commonjs babel src --out-dir lib",
+    "build:es": "babel src --out-dir es",
+    "build": "npm run build:lib && npm run build:es",
+    "clean": "rimraf lib es",
+    "prepare": "npm run clean && npm test",
+    "pretest": "npm run build",
+    "test": "jest",
+    "test:cov": "npm test -- --coverage"
+  },
+  "peerDependencies": {
+    "react": "^16.7.0"
+  },
+  "dependencies": {
+    "prop-types": "^15.6.2",
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.2.0",
+    "@babel/core": "^7.2.0",
+    "@babel/plugin-proposal-class-properties": "^7.2.0",
+    "@babel/plugin-proposal-object-rest-spread": "^7.2.0",
+    "@babel/plugin-transform-runtime": "^7.2.0",
+    "@babel/preset-env": "^7.3.1",
+    "@babel/preset-react": "^7.0.0",
+    "babel-jest": "^24.0.0",
+    "cross-env": "^5.2.0",
+    "enzyme": "^3.8.0",
+    "enzyme-adapter-react-16": "^1.8.0",
+    "jest": "^24.0.0",
+    "react": "^16.7.0",
+    "react-dom": "^16.7.0",
+    "react-test-renderer": "^16.7.0",
+    "rimraf": "^2.6.2",
+    "sinon": "^7.2.3"
+  },
+  "jest": {
+    "testRegex": "(/test/.*\\.spec\\.js)$",
+    "setupFilesAfterEnv": [
+      "<rootDir>/test/_setup.js"
+    ],
+    "collectCoverageFrom": [
+      "src/**/*.js",
+      "!src/**/index.js",
+      "!src/index.js"
+    ]
+  }
+}
