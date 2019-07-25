@@ -1,6 +1,6 @@
 {
   "name": "react-entities",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "React Entities - the simplest app state management for React",
   "keywords": [
     "react",
@@ -12,6 +12,7 @@
   ],
   "author": "Arnel Enero <aenero@gmail.com>",
   "license": "MIT",
+  "repository": "github:arnelenero/react-entities",
   "main": "lib/index.js",
   "module": "es/index.js",
   "files": [
@@ -33,7 +34,8 @@
     "react": "^16.7.0"
   },
   "dependencies": {
-    "prop-types": "^15.6.2",
+    "@babel/runtime": "^7.5.5",
+    "prop-types": "^15.6.2"
   },
   "devDependencies": {
     "@babel/cli": "^7.2.0",
