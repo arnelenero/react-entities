@@ -4,9 +4,8 @@ import store from './store';
 
 export const useEntity = entityId => {
   const entity = store[entityId];
-  if (!entity) throw new Error('Unknown entity passed to useEntity');
-
   const newListener = useState()[1];
+
   useEffect(() => {
     entity.listeners.push(newListener);
     return () => {
@@ -15,6 +14,7 @@ export const useEntity = entityId => {
       );
     };
   }, []);
+
   return [entity.state, entity.actions];
 };
 

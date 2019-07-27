@@ -22,16 +22,20 @@ export const bindActions = (actions, entity) => {
   return entityActions;
 };
 
-export const makeEntity = ({ initialState, ...actions }) => {
-  const entityId = getNextId();
-  const entity = (store[entityId] = {
+export const createEntity = (id, initialState, actions) => {
+  const entity = (store[id] = {
     state: initialState || {},
     listeners: [],
   });
   entity.setState = createSetState(entity);
   entity.actions = bindActions(actions, entity);
+};
 
-  return () => useEntity(entityId);
+export const makeEntity = ({ initialState, ...actions }) => {
+  const id = getNextId();
+  createEntity(id, initialState, actions);
+
+  return () => useEntity(id);
 };
 
 export default makeEntity;
