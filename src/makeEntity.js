@@ -1,4 +1,4 @@
-import { store, getNextId } from './store';
+import { store, reserveNextEntityId } from './store';
 import useEntity from './useEntity';
 
 export const createSetState = entity => {
@@ -32,7 +32,7 @@ export const createEntity = (id, initialState, actions) => {
 };
 
 export const makeEntity = ({ initialState, ...actions }) => {
-  const id = getNextId();
+  const id = reserveNextEntityId();
   createEntity(id, initialState, actions);
 
   return () => useEntity(id);

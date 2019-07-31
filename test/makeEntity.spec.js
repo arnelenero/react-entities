@@ -5,20 +5,11 @@ import { makeEntity } from '../src/makeEntity';
 
 let hookValue = null;
 let component = null;
-let renderCount = 0;
 
 let useCounter = null;
-let counter;
-let increment;
-let decrement;
 
 const CounterView = () => {
   hookValue = useCounter();
-  [counter, { increment, decrement }] = hookValue;
-
-  useEffect(() => {
-    renderCount++;
-  });
 
   return null;
 };
@@ -54,6 +45,7 @@ describe('makeEntity', () => {
     expect(hookValue).toHaveLength(2);
   });
   it('sets the initial state of the entity', () => {
+    const counter = hookValue[0];
     expect(counter).toHaveProperty('value', 0);
   });
 });

@@ -1,15 +1,15 @@
 import React, { useEffect } from 'react';
 import { mount } from 'enzyme';
 
-import { useEntity } from '../src/useEntity';
-import { createEntity } from '../src/makeEntity';
+import { makeEntity } from '../src/makeEntity';
 
+let useEntity = null;
 let hookValue = null;
 let component = null;
 let renderCount = 0;
 
 const CounterView = () => {
-  hookValue = useEntity('counter');
+  hookValue = useEntity();
 
   useEffect(() => {
     renderCount++;
@@ -23,16 +23,15 @@ beforeAll(() => {
     value: 0,
   };
 
-  const actions = {
-    increment: function() {
-      this.setState({ value: this.state.value + 1 });
-    },
-    decrement: function() {
-      this.setState({ value: this.state.value - 1 });
-    },
-  };
+  function increment() {
+    this.setState({ value: this.state.value + 1 });
+  }
 
-  createEntity('counter', initialState, actions);
+  function decrement() {
+    this.setState({ value: this.state.value - 1 });
+  }
+
+  useEntity = makeEntity({ initialState, increment, decrement });
 });
 
 beforeEach(() => {
@@ -50,14 +49,18 @@ describe('useEntity', () => {
   });
 
   it('returns the entity state object as the first item', () => {
-    expect(hookValue[0]).toBeInstanceOf(Object);
-    expect(hookValue[0]).toHaveProperty('value');
+    const state = hookValue[0];
+    expect(state).toBeInstanceOf(Object);
+    expect(state).toHaveProperty('value');
   });
 
   it('returns the actions object as the second item', () => {
-    expect(hookValue[1]).toBeInstanceOf(Object);
-    expect(hookValue[1]).toHaveProperty('increment');
-    expect(hookValue[1]).toHaveProperty('decrement');
+    const actions = hookValue[1];
+    expect(actions).toBeInstanceOf(Object);
+    expect(actions).toHaveProperty('increment');
+    expect(actions.increment).toBeInstanceOf(Function);
+    expect(actions).toHaveProperty('decrement');
+    expect(actions.decrement).toBeInstanceOf(Function);
   });
 
   it('subscribes the component to changes in entity state caused by an action', () => {
