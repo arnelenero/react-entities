@@ -13,11 +13,11 @@ export const createSetState = entity => {
 export const bindActions = (actions, entity) => {
   const entityActions = {};
 
-  Object.keys(actions).forEach(key => {
+  for (let key in actions) {
     if (typeof actions[key] === 'function') {
       entityActions[key] = actions[key].bind(entity);
     }
-  });
+  }
 
   return entityActions;
 };
