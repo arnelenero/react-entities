@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { act } from 'react-dom/test-utils';
 import { mount } from 'enzyme';
 
 import { makeEntity } from '../src/makeEntity';
@@ -66,15 +67,19 @@ describe('useEntity', () => {
   it('subscribes the component to changes in entity state caused by an action', () => {
     const actions = hookValue[1];
     const prevRenderCount = renderCount;
-    actions.increment();
-    setTimeout(() => expect(renderCount).toBe(prevRenderCount + 1));
+    act(() => {
+      actions.increment();
+    });
+    expect(renderCount).toBe(prevRenderCount + 1);
   });
 
   it('unsubscribes the component when it unmounts', () => {
     const actions = hookValue[1];
     const prevRenderCount = renderCount;
     component.unmount();
-    actions.increment();
-    setTimeout(() => expect(renderCount).toBe(prevRenderCount));
+    act(() => {
+      actions.increment();
+    });
+    expect(renderCount).toBe(prevRenderCount);
   });
 });
