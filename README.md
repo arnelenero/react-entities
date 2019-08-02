@@ -86,7 +86,7 @@ export const useCounter = makeEntity(counter);
 
 ## Using Entity Hooks in Components
 
-An entity hook returns an array containing two items: the entity state object, and an object containing all the entity's actions.
+An entity hook returns an array containing two items: the entity state object, and an object containing all the entity's actions. This allows the component to both reference the entity's current state, and invoke its actions within callbacks and effects.
 
 Here is an example usage:
 
@@ -97,7 +97,7 @@ import React, { useCallback } from 'react';
 import { useCounter } from './entities';
 
 const CounterView = () => {
-  [counter, { increment, decrement }] = useCounter();
+  const [counter, { increment, decrement }] = useCounter();
 
   const handleClickIncrement = useCallback(() => increment(), []);
   const handleClickDecrement = useCallback(() => decrement(), []);
@@ -108,3 +108,6 @@ const CounterView = () => {
     <button onClick={handleClickDecrement}>Decrement</button>
   )
 };
+```
+
+As you can see in the above example, it is typical to use the object-spread operator to extract only the relevant actions from the entity, instead of the entire actions object.
