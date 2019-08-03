@@ -4,9 +4,9 @@ import useEntity from './useEntity';
 export const createSetState = entity => {
   return updates => {
     entity.state = { ...entity.state, ...updates };
-    entity.subscribers.forEach(setState => {
-      setState(entity.state);
-    });
+    for (let i = 0, c = entity.subscribers.length; i < c; i++) {
+      entity.subscribers[i](entity.state);
+    }
   };
 };
 

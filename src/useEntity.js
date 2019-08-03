@@ -9,9 +9,12 @@ export const useEntity = entityId => {
   useEffect(() => {
     entity.subscribers.push(setState);
     return () => {
-      entity.subscribers = entity.subscribers.filter(
-        subscriber => subscriber !== setState
-      );
+      for (let i = 0, c = entity.subscribers.length; i < c; i++) {
+        if (entity.subscribers[i] === setState) {
+          entity.subscribers.splice(i, 1);
+          break;
+        }
+      }
     };
   }, []);
 
