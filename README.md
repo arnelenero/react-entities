@@ -105,9 +105,11 @@ const CounterView = () => {
   const handleClickDecrement = useCallback(() => decrement(), []);
 
   return (
-    <div>{counter.value}</div>
-    <button onClick={handleClickIncrement}>Increment</button>
-    <button onClick={handleClickDecrement}>Decrement</button>
+    <>
+      <div>{counter.value}</div>
+      <button onClick={handleClickIncrement}>Increment</button>
+      <button onClick={handleClickDecrement}>Decrement</button>
+    </>
   )
 };
 ```
