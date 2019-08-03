@@ -4,8 +4,8 @@ import useEntity from './useEntity';
 export const createSetState = entity => {
   return updates => {
     entity.state = { ...entity.state, ...updates };
-    entity.listeners.forEach(listener => {
-      listener(entity.state);
+    entity.subscribers.forEach(setState => {
+      setState(entity.state);
     });
   };
 };
@@ -25,7 +25,7 @@ export const bindActions = (actions, entity) => {
 export const createEntity = (id, initialState, actions) => {
   const entity = (store[id] = {
     state: initialState || {},
-    listeners: [],
+    subscribers: [],
   });
   entity.setState = createSetState(entity);
   entity.actions = bindActions(actions, entity);

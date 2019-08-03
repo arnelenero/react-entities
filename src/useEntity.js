@@ -4,13 +4,13 @@ import store from './store';
 
 export const useEntity = entityId => {
   const entity = store[entityId];
-  const newListener = useState()[1];
+  const setState = useState()[1];
 
   useEffect(() => {
-    entity.listeners.push(newListener);
+    entity.subscribers.push(setState);
     return () => {
-      entity.listeners = entity.listeners.filter(
-        listener => listener !== newListener
+      entity.subscribers = entity.subscribers.filter(
+        subscriber => subscriber !== setState
       );
     };
   }, []);
