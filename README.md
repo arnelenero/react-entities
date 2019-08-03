@@ -111,3 +111,34 @@ const CounterView = () => {
 ```
 
 As you can see in the above example, it is typical to use the object-spread operator to extract only the relevant actions from the entity, instead of the entire actions object.
+
+## Recipes
+
+With the very straightforward, largely unopinionated approach that React Entities brings to managing app state, you have full flexibility to implement things the way you want. It works seamlessly with whatever code architecture you choose for your React app. 
+
+Here we provide some suggested patterns that you may consider for specific scenarios.
+
+### Async fetch operations within actions
+
+In some cases components require data that has to be fetched from the server. For this we would need an async operation that sends the fetch request and waits for server response.
+
+Typical actions immediately make state changes then terminate. But because actions are just functions, they can contain any operations, including async ones. This affords us the flexibility of implementing data fetches inside actions.
+
+Here is an example:
+
+**settings.js**
+```javascript
+import { fetchConfig } from './configService';
+
+export const initialState = {
+  loading: false,
+  config: null
+};
+
+export async function loadConfig() {
+  this.setState({ loading: true });
+
+  const res = await fetchConfig();
+  this.setState({ loading: false, config: res });
+}
+```
