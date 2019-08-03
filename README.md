@@ -4,12 +4,14 @@ React Entities is an ultra-lightweight library that provides the simplest global
 
 If you are familiar with Redux, you may consider this alternative for the following reasons:
 - No complex boilerplate code required
+- Much less steep learning curve
 - No need for reducers and dispatch
 - Uses plain functions to implement actions
 - No need for middleware and other added complexities
 - Does not use Context API; has straightforward subscription instead
 - No explicit container (i.e. "store") to care about
 - Made specifically for React, and built on React Hooks 
+- It is tiny, only about 1 KB
 
 You may also consider React Entities to replace other app-state libraries if you prefer to keep things as simple as possible.
 
