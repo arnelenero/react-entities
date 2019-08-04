@@ -43,13 +43,13 @@ A typical entity definition would be a regular module that exports an `initialSt
     value: 0
   };
 
-  export function increment() {
-    this.setState({ value: this.state.value + 1 });
-  }
+  export const increment = counter => by => {
+    counter.setState({ value: counter.state.value + by });
+  };
 
-  export function decrement() {
-    this.setState({ value: this.state.value - 1 });
-  }
+  export const decrement = counter => by => {
+    counter.setState({ value: counter.state.value - by });
+  };
 ```
 
 ### Defining the initial state
@@ -58,15 +58,15 @@ It is recommended that you define the `initialState` of an entity to properly se
 
 ### Defining the actions
 
-In the example above, `increment` and `decrement` are both actions. It is important to note that actions should be **regular functions**, and not arrow functions, because they need to have proper context to `this`, which represents the entity itself.
+In the example above, `increment` and `decrement` are both actions. It is important to note that actions are defined using higher-order functions, with the top level function passing down the entity reference.
 
-Within an action function, you can use `this.state` to reference the current state of the entity. To make any changes to the state, you should use `this.setState()`. **Do not** directly mutate the `this.state` object.
+Within the actual action function, you can use `state` property of the entity to reference its current state. To make any changes to its state, you should use its `setState()`. **Do not** directly mutate the `state` object.
 
-The function `this.setState()` has the following signature:
+The function `setState()` has the following familiar signature:
 ```
 this.setState( changes )
 ```
-where `changes` is an object whose properties are merged into the current state, thus overriding the old values.
+where `changes` is an object whose properties are shallowly merged with the current state, thus overriding the old values. Unlike React's `setState()`, this one doesn't have to support updater function as argument given that the `state` value available within the action itself is *always* up-to-date.
 
 
 ## Creating Entity Hooks

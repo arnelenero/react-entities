@@ -24,13 +24,13 @@ beforeAll(() => {
     value: 0,
   };
 
-  function increment() {
-    this.setState({ value: this.state.value + 1 });
-  }
+  const increment = counter => () => {
+    counter.setState({ value: counter.state.value + 1 });
+  };
 
-  function decrement() {
-    this.setState({ value: this.state.value - 1 });
-  }
+  const decrement = counter => () => {
+    counter.setState({ value: counter.state.value - 1 });
+  };
 
   useEntity = makeEntity({ initialState, increment, decrement });
 });

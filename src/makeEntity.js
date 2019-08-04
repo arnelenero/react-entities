@@ -15,7 +15,11 @@ export const bindActions = (actions, entity) => {
 
   for (let key in actions) {
     if (typeof actions[key] === 'function') {
-      entityActions[key] = actions[key].bind(entity);
+      const action = actions[key](entity);
+      if (typeof action !== 'function')
+        throw new Error('Action must be defined using higher-order function.');
+      entityActions[key] = action;
+      //  entityActions[key] = actions[key].bind(entity);
     }
   }
 

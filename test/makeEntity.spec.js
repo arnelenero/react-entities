@@ -21,21 +21,21 @@ beforeAll(() => {
     wasReset: false,
   };
 
-  function increment() {
-    this.setState({ value: this.state.value + 1 });
-  }
+  const increment = counter => () => {
+    counter.setState({ value: counter.state.value + 1 });
+  };
 
-  function decrement() {
-    this.setState({ value: this.state.value - 1 });
-  }
+  const decrement = counter => () => {
+    counter.setState({ value: counter.state.value - 1 });
+  };
 
-  function reset() {
-    this.setState({ value: 0, wasReset: true });
-  }
+  const reset = counter => () => {
+    counter.setState({ value: 0, wasReset: true });
+  };
 
-  function hasBeenReset() {
-    return this.state.wasReset;
-  }
+  const hasBeenReset = counter => () => {
+    return counter.state.wasReset;
+  };
 
   useCounter = makeEntity({
     initialState,
@@ -66,14 +66,14 @@ describe('makeEntity', () => {
     expect(counter).toHaveProperty('value', 0);
   });
 
-  it('binds `this.state` inside action functions to current state of the entity', () => {
+  it('passes the current state of the entity to actions in the argument object', () => {
     const { hasBeenReset } = hookValue[1];
     const wasReset = hasBeenReset();
     expect(wasReset).toBeDefined();
     expect(wasReset).toBe(false);
   });
 
-  it('binds `this.setState` inside action functions to the state setter function', () => {
+  it('passes the `setState` of the entity to actions in the argument object', () => {
     const { reset, hasBeenReset } = hookValue[1];
     act(() => {
       reset();
