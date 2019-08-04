@@ -60,7 +60,7 @@ It is recommended that you define the `initialState` of an entity to properly se
 
 In the example above, `increment` and `decrement` are both actions. It is important to note that actions are defined using higher-order functions, with the top level function passing down the entity reference.
 
-Within the actual action function, you can use `state` property of the entity to reference its current state. To make any changes to its state, you should use its `setState()`. **Do not** directly mutate the `state` object.
+Within the actual action function, you can use the `state` property of the entity to reference its current state. To make any changes to its state, you should use its `setState()`. **Do not** directly mutate the `state` object.
 
 The function `setState()` has the following familiar signature:
 ```
@@ -81,7 +81,7 @@ This function creates an entity based on the provided definition, then returns a
 **entities/index.js**
 ```javascript
 import { makeEntity } from 'react-entities';
-import * as counter from './counter'
+import * as counter from './counter';
 
 export const useCounter = makeEntity(counter);
 ```
@@ -101,8 +101,8 @@ import { useCounter } from './entities';
 const CounterView = () => {
   const [counter, { increment, decrement }] = useCounter();
 
-  const handleClickIncrement = useCallback(() => increment(), []);
-  const handleClickDecrement = useCallback(() => decrement(), []);
+  const handleClickIncrement = useCallback(() => increment(1), []);
+  const handleClickDecrement = useCallback(() => decrement(1), []);
 
   return (
     <>
@@ -139,11 +139,11 @@ export const initialState = {
   config: null
 };
 
-export async function loadConfig() {
-  this.setState({ loading: true });
+export loadConfig = settings => async () => {
+  settings.setState({ loading: true });
 
   const res = await fetchConfig();
-  this.setState({ loading: false, config: res });
+  settings.setState({ loading: false, config: res });
 }
 ```
 
