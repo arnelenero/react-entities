@@ -19,7 +19,6 @@ export const bindActions = (actions, entity) => {
       if (typeof action !== 'function')
         throw new Error('Action must be defined using higher-order function.');
       entityActions[key] = action;
-      //  entityActions[key] = actions[key].bind(entity);
     }
   }
 
