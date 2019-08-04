@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { act } from 'react-dom/test-utils';
 import { mount } from 'enzyme';
 
-import { makeEntity } from '../src/makeEntity';
+import makeEntity from '../src/makeEntity';
 
 let useEntity = null;
 let hookValue = null;

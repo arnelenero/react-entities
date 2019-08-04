@@ -2,7 +2,7 @@ import React from 'react';
 import { act } from 'react-dom/test-utils';
 import { mount } from 'enzyme';
 
-import { makeEntity } from '../src/makeEntity';
+import makeEntity from '../src/makeEntity';
 
 let hookValue = null;
 let component = null;
@@ -37,7 +37,13 @@ beforeAll(() => {
     return this.state.wasReset;
   }
 
-  useCounter = makeEntity({ initialState, increment, decrement, reset, hasBeenReset });
+  useCounter = makeEntity({
+    initialState,
+    increment,
+    decrement,
+    reset,
+    hasBeenReset,
+  });
 });
 
 beforeEach(() => {

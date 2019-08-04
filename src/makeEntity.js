@@ -26,6 +26,9 @@ export const createEntity = (id, initialState, actions) => {
   const entity = (store[id] = {
     state: initialState || {},
     subscribers: [],
+    reset: () => {
+      entity.state = initialState;
+    },
   });
   entity.setState = createSetState(entity);
   entity.actions = bindActions(actions, entity);
