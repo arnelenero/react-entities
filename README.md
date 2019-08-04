@@ -64,7 +64,7 @@ Within the actual action function, you can use the `state` property of the entit
 
 The function `setState()` has the following familiar signature:
 ```
-this.setState( changes )
+entity.setState( changes )
 ```
 where `changes` is an object whose properties are shallowly merged with the current state, thus overriding the old values. Unlike React's `setState()`, this one doesn't have to support updater function as argument given that the `state` value available within the action itself is *always* up-to-date.
 
