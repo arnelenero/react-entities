@@ -3,11 +3,15 @@ import { act } from 'react-dom/test-utils';
 import { mount } from 'enzyme';
 
 import makeEntity from '../src/makeEntity';
+import useEntitiesTeardown from '../src/useEntitiesTeardown';
 
 let useEntity = null;
 let hookValue = null;
+let hookValueB = null;
 let component = null;
+let componentB = null;
 let renderCount = 0;
+let renderCountB = 0;
 
 const CounterView = () => {
   hookValue = useEntity();
@@ -15,6 +19,20 @@ const CounterView = () => {
   useEffect(() => {
     renderCount++;
   });
+
+  useEntitiesTeardown();
+
+  return null;
+};
+
+const NextCounterView = () => {
+  hookValueB = useEntity();
+
+  useEffect(() => {
+    renderCountB++;
+  });
+
+  useEntitiesTeardown();
 
   return null;
 };
@@ -71,6 +89,31 @@ describe('useEntity', () => {
       actions.increment();
     });
     expect(renderCount).toBe(prevRenderCount + 1);
+  });
+
+  it('always provides the updated entity state to the subscribed component', () => {
+    const actions = hookValue[1];
+    act(() => {
+      actions.increment();
+    });
+    expect(hookValue[0]).toHaveProperty('value', 1);
+  });
+
+  it('subscribes ALL components that use the hook', () => {
+    componentB = mount(<NextCounterView />);
+
+    const actions = hookValue[1];
+    const prevRenderCount = renderCount;
+    const prevRenderCountB = renderCountB;
+    act(() => {
+      actions.increment();
+    });
+    expect(renderCount).toBe(prevRenderCount + 1);
+    expect(hookValue[0]).toHaveProperty('value', 1);
+    expect(renderCountB).toBe(prevRenderCountB + 1);
+    expect(hookValueB[0]).toHaveProperty('value', 1);
+
+    componentB.unmount();
   });
 
   it('unsubscribes the component when it unmounts', () => {

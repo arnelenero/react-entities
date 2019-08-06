@@ -147,31 +147,23 @@ export loadConfig = settings => async () => {
 }
 ```
 
-### Teardown of entities for testing
+### Teardown of entities for better app testability
 
 All the entities are stored at the module level, outside of the React component tree. For the app itself, this is not a problem. However, in testing the app, you would typically setup and teardown the App component multiple times, and therefore entities must be reset to initial state each time.
 
-For this purpose you can use the `useEntitiesTeardown` hook. It resets all entities each time the host component unmounts. Since you don't need this in the App component itself, in your test scripts you can wrap the App component with a shell component that uses this hook.
+For this purpose you can use the `useEntitiesTeardown` hook. It resets all entities each time the host component unmounts. Use this hook in a top-level component, typically the `App`.
 
 Here is an example usage:
 
-**test/App.spec.js**
+**App.js**
 ```javascript
 import { useEntitiesTeardown } from 'react-entities';
 
-const TestShell = () => {
+const App = () => {
   useEntitiesTeardown();
 
-  return <App />;
+  return ( 
+    . . .
+  );
 };
-
-let component;
-beforeEach(() => {
-  component = mount(<TestShell />);
-});
-afterEach(() => {
-  component.unmount();
-});
-
-// Your test scripts here ...
 ```
