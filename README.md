@@ -147,7 +147,7 @@ export loadConfig = settings => async () => {
 }
 ```
 
-### Teardown of entities for better app testability
+### Teardown of entities for app testability
 
 All the entities are stored at the module level, outside of the React component tree. For the app itself, this is not a problem. However, in testing the app, you would typically setup and teardown the App component multiple times, and therefore entities must be reset to initial state each time.
 
