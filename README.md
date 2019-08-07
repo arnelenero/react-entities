@@ -11,7 +11,7 @@ If you are familiar with Redux, you may consider this alternative for the follow
 - Does not use Context API; has straightforward subscription instead
 - No explicit container (i.e. "store") to care about
 - Made specifically for React, and built on React Hooks 
-- 3x faster than useContext + useReducer solution
+- 3x faster than useContext + useReducer Redux alternatives
 - It is tiny, only about 1 KB
 
 You may also consider React Entities to replace other app-state libraries if you prefer to keep things as simple as possible.
