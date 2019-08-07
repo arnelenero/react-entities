@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 
 import store from './store';
 
-export const useEntitiesTeardown = () => {
+export const useEntityBoundary = () => {
   useEffect(() => {
     return () => {
       for (let entity in store) {
@@ -12,4 +12,4 @@ export const useEntitiesTeardown = () => {
   }, []);
 };
 
-export default useEntitiesTeardown;
+export default useEntityBoundary;

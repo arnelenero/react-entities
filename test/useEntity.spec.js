@@ -3,7 +3,7 @@ import { act } from 'react-dom/test-utils';
 import { mount } from 'enzyme';
 
 import makeEntity from '../src/makeEntity';
-import useEntitiesTeardown from '../src/useEntitiesTeardown';
+import useEntityBoundary from '../src/useEntityBoundary';
 
 let useEntity = null;
 let hookValue = null;
@@ -20,7 +20,7 @@ const CounterView = () => {
     renderCount++;
   });
 
-  useEntitiesTeardown();
+  useEntityBoundary();
 
   return null;
 };
@@ -32,7 +32,7 @@ const NextCounterView = () => {
     renderCountB++;
   });
 
-  useEntitiesTeardown();
+  useEntityBoundary();
 
   return null;
 };
