@@ -152,16 +152,16 @@ export loadConfig = settings => async () => {
 
 All the entities are stored at the module level, outside of the React component tree. For the app itself, this is not a problem. However, in testing the app, you would typically setup and teardown the App component multiple times, and therefore entities must be reset to initial state each time.
 
-For this purpose you can use the `useEntitiesTeardown` hook. It resets all entities each time the host component unmounts. Use this hook in a top-level component, typically the `App`.
+For this purpose you can use the `useEntityBoundary` hook. It resets all entities each time the host component unmounts. Use this hook in a top-level component, typically the `App`.
 
 Here is an example usage:
 
 **App.js**
 ```javascript
-import { useEntitiesTeardown } from 'react-entities';
+import { useEntityBoundary } from 'react-entities';
 
 const App = () => {
-  useEntitiesWhileMounted();
+  useEntityBoundary();
 
   return ( 
     . . .
