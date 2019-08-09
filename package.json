@@ -15,6 +15,7 @@
   "repository": "github:arnelenero/react-entities",
   "main": "lib/index.js",
   "module": "es/index.js",
+  "typings": "./index.d.ts",
   "files": [
     "lib",
     "es",
