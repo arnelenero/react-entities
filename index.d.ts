@@ -28,3 +28,5 @@ export type EntityHookValue<S> = [S, ActionsObject];
 export type EntityHook<S> = () => EntityHookValue<S>;
 
 export function makeEntity<S = object>(definition: EntityDefinition<S>): EntityHook<S>;
+
+export function useEntityBoundary(): void;
