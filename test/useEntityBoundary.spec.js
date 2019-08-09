@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { act } from 'react-dom/test-utils';
 import { mount } from 'enzyme';
 
-import useEntitiesTeardown from '../src/useEntitiesTeardown';
+import useEntityBoundary from '../src/useEntityBoundary';
 import makeEntity from '../src/makeEntity';
 
 let useEntityA = null;
@@ -13,7 +13,7 @@ let component = null;
 let mountCount = 0;
 
 const TestShell = () => {
-  useEntitiesTeardown();
+  useEntityBoundary();
 
   return <CounterView />;
 };
@@ -54,7 +54,7 @@ afterEach(() => {
   if (component.exists()) component.unmount();
 });
 
-describe('useEntity', () => {
+describe('useEntityBoundary', () => {
   it('resets entities to initial state every time the component unmounts', () => {
     const prevMountCount = mountCount;
     const { increment } = hookValueA[1];

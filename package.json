@@ -1,6 +1,6 @@
 {
   "name": "react-entities",
-  "version": "0.2.0",
+  "version": "0.3.3",
   "description": "React Entities - the simplest app state management for React",
   "keywords": [
     "react",
@@ -15,6 +15,7 @@
   "repository": "github:arnelenero/react-entities",
   "main": "lib/index.js",
   "module": "es/index.js",
+  "typings": "./index.d.ts",
   "files": [
     "lib",
     "es",
@@ -32,7 +33,7 @@
     "test:cov": "npm test -- --coverage"
   },
   "peerDependencies": {
-    "react": "^16.7.0"
+    "react": "^16.8.0"
   },
   "dependencies": {
     "@babel/runtime": "^7.5.5"
@@ -50,9 +51,9 @@
     "enzyme": "^3.8.0",
     "enzyme-adapter-react-16": "^1.8.0",
     "jest": "^24.0.0",
-    "react": "^16.7.0",
-    "react-dom": "^16.7.0",
-    "react-test-renderer": "^16.7.0",
+    "react": "^16.8.0",
+    "react-dom": "^16.8.0",
+    "react-test-renderer": "^16.8.0",
     "rimraf": "^2.6.2",
     "sinon": "^7.2.3"
   },

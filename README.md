@@ -11,6 +11,7 @@ If you are familiar with Redux, you may consider this alternative for the follow
 - Does not use Context API; has straightforward subscription instead
 - No explicit container (i.e. "store") to care about
 - Made specifically for React, and built on React Hooks 
+- 3x faster than useContext + useReducer Redux alternatives
 - It is tiny, only about 1 KB
 
 You may also consider React Entities to replace other app-state libraries if you prefer to keep things as simple as possible.
@@ -147,31 +148,23 @@ export loadConfig = settings => async () => {
 }
 ```
 
-### Teardown of entities for testing
+### Teardown of entities for app testability
 
 All the entities are stored at the module level, outside of the React component tree. For the app itself, this is not a problem. However, in testing the app, you would typically setup and teardown the App component multiple times, and therefore entities must be reset to initial state each time.
 
-For this purpose you can use the `useEntitiesTeardown` hook. It resets all entities each time the host component unmounts. Since you don't need this in the App component itself, in your test scripts you can wrap the App component with a shell component that uses this hook.
+For this purpose you can use the `useEntityBoundary` hook. It resets all entities each time the host component unmounts. Use this hook in a top-level component, typically the `App`.
 
 Here is an example usage:
 
-**test/App.spec.js**
+**App.js**
 ```javascript
-import { useEntitiesTeardown } from 'react-entities';
+import { useEntityBoundary } from 'react-entities';
 
-const TestShell = () => {
-  useEntitiesTeardown();
+const App = () => {
+  useEntityBoundary();
 
-  return <App />;
+  return ( 
+    . . .
+  );
 };
-
-let component;
-beforeEach(() => {
-  component = mount(<TestShell />);
-});
-afterEach(() => {
-  component.unmount();
-});
-
-// Your test scripts here ...
 ```
