@@ -10,12 +10,12 @@ export const createSetState = entity => {
   };
 };
 
-export const bindActions = (actions, entity) => {
+export const bindActions = (actions, entity, deps) => {
   const entityActions = {};
 
   for (let key in actions) {
     if (typeof actions[key] === 'function') {
-      const action = actions[key](entity);
+      const action = actions[key](entity, deps);
       if (typeof action !== 'function')
         throw new Error('Action must be defined using higher-order function.');
       entityActions[key] = action;
@@ -25,7 +25,7 @@ export const bindActions = (actions, entity) => {
   return entityActions;
 };
 
-export const createEntity = (id, initialState, actions) => {
+export const createEntity = (id, initialState, actions, deps) => {
   const entity = (store[id] = {
     state: initialState || {},
     subscribers: [],
@@ -34,12 +34,12 @@ export const createEntity = (id, initialState, actions) => {
     },
   });
   entity.setState = createSetState(entity);
-  entity.actions = bindActions(actions, entity);
+  entity.actions = bindActions(actions, entity, deps);
 };
 
-export const makeEntity = ({ initialState, ...actions }) => {
+export const makeEntity = ({ initialState, ...actions }, deps) => {
   const id = reserveNextEntityId();
-  createEntity(id, initialState, actions);
+  createEntity(id, initialState, actions, deps);
 
   return () => useEntity(id);
 };

@@ -128,7 +128,7 @@ Typical actions immediately make state changes then terminate. But because actio
 
 Here is an example:
 
-**settings.js**
+**entities/settings.js**
 ```javascript
 import { fetchConfig } from './configService';
 
@@ -144,6 +144,38 @@ export loadConfig = settings => async () => {
   settings.setState({ loading: false, config: res });
 }
 ```
+
+### Injecting dependencies into entities
+
+Sometimes you would need to mock the API calls, for example, when unit testing your entities. In scenarios like these, you can take advantage of dependency injection. The `makeEntity` function accepts an optional second argument which is passed onto your entity.
+
+**entities/index.js**
+```javascript
+import { makeEntity } from 'react-entities';
+import * as settings from './settings';
+import * as configMock from './configMock';
+
+export const useSettings = makeEntity(settings, configMock);
+```
+
+This second argument is passed automatically as extra argument to your action composer function.
+
+**entities/settings.js**
+```javascript
+export const initialState = {
+  loading: false,
+  config: null
+};
+
+export loadConfig = (settings, service) => async () => {
+  settings.setState({ loading: true });
+
+  const res = await service.fetchConfig();
+  settings.setState({ loading: false, config: res });
+}
+```
+
+In the example above, the `service` would be the `configMock` passed through `makeEntity`.
 
 ### Teardown of entities for app testability
 

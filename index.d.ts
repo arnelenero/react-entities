@@ -20,13 +20,13 @@ export type ActionComposer = (entity: Entity) => Action;
 
 export interface EntityDefinition<S = object> {
   initialState?: S;
-  [actions: string]: ActionComposer | S;
+  [actions: string]: ActionComposer;
 } 
 
 export type EntityHookValue<S, T> = [S, T];
 
 export type EntityHook<S, T> = () => EntityHookValue<S, T>;
 
-export function makeEntity<S = object, T = ActionsObject>(definition: EntityDefinition<S>): EntityHook<S, T>;
+export function makeEntity<S = object, T = ActionsObject>(definition: EntityDefinition<S>, deps?: any): EntityHook<S, T>;
 
 export function useEntityBoundary(): void;

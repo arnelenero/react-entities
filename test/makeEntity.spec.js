@@ -19,6 +19,7 @@ beforeAll(() => {
   const initialState = {
     value: 0,
     wasReset: false,
+    secret: null,
   };
 
   const increment = counter => () => {
@@ -33,17 +34,29 @@ beforeAll(() => {
     counter.setState({ value: 0, wasReset: true });
   };
 
+  const callService = (counter, svc) => () => {
+    counter.setState({ secret: svc.getSecret() });
+  };
+
   const hasBeenReset = counter => () => {
     return counter.state.wasReset;
   };
 
-  useCounter = makeEntity({
-    initialState,
-    increment,
-    decrement,
-    reset,
-    hasBeenReset,
-  });
+  const service = {
+    getSecret: () => '1234',
+  };
+
+  useCounter = makeEntity(
+    {
+      initialState,
+      increment,
+      decrement,
+      reset,
+      callService,
+      hasBeenReset,
+    },
+    service
+  );
 });
 
 beforeEach(() => {
@@ -80,5 +93,14 @@ describe('makeEntity', () => {
     });
     const wasReset = hasBeenReset();
     expect(wasReset).toBe(true);
+  });
+
+  it('allows injecting dependencies into the entity', () => {
+    const { callService } = hookValue[1];
+    act(() => {
+      callService();
+    });
+    const counter = hookValue[0];
+    expect(counter).toHaveProperty('secret', '1234');
   });
 });
