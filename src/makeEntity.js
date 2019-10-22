@@ -4,7 +4,7 @@ import useEntity from './useEntity';
 export const createSetState = entity => {
   return updates => {
     entity.state = { ...entity.state, ...updates };
-    for (let i = 0, c = entity.subscribers.length; i < c; i++) {
+    for (let i = 0; i < entity.subscribers.length; i++) {
       entity.subscribers[i](entity.state);
     }
   };
