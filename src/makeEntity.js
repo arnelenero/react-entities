@@ -5,7 +5,15 @@ export const createSetState = entity => {
   return updates => {
     entity.state = { ...entity.state, ...updates };
     for (let i = 0; i < entity.subscribers.length; i++) {
-      entity.subscribers[i](entity.state);
+      if (typeof entity.subscribers[i] === 'function')
+        entity.subscribers[i](entity.state);
+    }
+
+    // Cleanup any nullified subscribers due to possible
+    // component unmounts caused by this app state change
+    for (let i = 0; i < entity.subscribers.length; i++) {
+      if (typeof entity.subscribers[i] !== 'function')
+        entity.subscribers.splice(i, 1);
     }
   };
 };
