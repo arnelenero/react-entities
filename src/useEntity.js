@@ -11,7 +11,7 @@ export const useEntity = (entityId, selector = state => state) => {
     entity.subscribers.push(subscriberFn);
     return () => {
       for (let i = 0, c = entity.subscribers.length; i < c; i++) {
-        if (entity.subscribers[i] === setState) {
+        if (entity.subscribers[i] === subscriberFn) {
           // Avoid causing subscribers array items to shift at this point.
           // The subscriber invocation loop in entity (see makeEntity.js)
           // should do the cleanup instead.
