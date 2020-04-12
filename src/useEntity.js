@@ -2,12 +2,13 @@ import { useState, useEffect } from 'react';
 
 import store from './store';
 
-export const useEntity = entityId => {
+export const useEntity = (entityId, selector = state => state) => {
   const entity = store[entityId];
-  const setState = useState()[1];
+  const setState = useState(selector(entity.state))[1];
+  const subscriberFn = newState => setState(selector(newState));
 
   useEffect(() => {
-    entity.subscribers.push(setState);
+    entity.subscribers.push(subscriberFn);
     return () => {
       for (let i = 0, c = entity.subscribers.length; i < c; i++) {
         if (entity.subscribers[i] === setState) {
@@ -22,7 +23,7 @@ export const useEntity = entityId => {
     };
   }, []);
 
-  return [entity.state, entity.actions];
+  return [selector(entity.state), entity.actions];
 };
 
 export default useEntity;

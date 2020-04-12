@@ -25,6 +25,18 @@ const CounterView = () => {
   return null;
 };
 
+const CounterViewWithSelector = () => {
+  hookValueB = useEntity(state => state.value);
+
+  useEffect(() => {
+    renderCountB++;
+  });
+
+  useEntityBoundary();
+
+  return null;
+};
+
 const NextCounterView = () => {
   hookValueB = useEntity();
 
@@ -40,6 +52,7 @@ const NextCounterView = () => {
 beforeAll(() => {
   const initialState = {
     value: 0,
+    irrelevant: 'a',
   };
 
   const increment = counter => () => {
@@ -50,7 +63,11 @@ beforeAll(() => {
     counter.setState({ value: counter.state.value - 1 });
   };
 
-  useEntity = makeEntity({ initialState, increment, decrement });
+  const setIrrelevant = counter => val => {
+    counter.setState({ irrelevant: val });
+  };
+
+  useEntity = makeEntity({ initialState, increment, decrement, setIrrelevant });
 });
 
 beforeEach(() => {
@@ -91,12 +108,37 @@ describe('useEntity', () => {
     expect(renderCount).toBe(prevRenderCount + 1);
   });
 
+  it('subscribes the component to changes in only the relevant fields when using selector', () => {
+    componentB = mount(<CounterViewWithSelector />);
+
+    const actions = hookValueB[1];
+    const prevRenderCountB = renderCountB;
+    act(() => {
+      actions.setIrrelevant('b');
+    });
+    expect(renderCountB).toBe(prevRenderCountB);
+
+    componentB.unmount();
+  });
+
   it('always provides the updated entity state to the subscribed component', () => {
     const actions = hookValue[1];
     act(() => {
       actions.increment();
     });
     expect(hookValue[0]).toHaveProperty('value', 1);
+  });
+
+  it('applies the specified selector (if any) to the entity state returned', () => {
+    componentB = mount(<CounterViewWithSelector />);
+
+    const actions = hookValueB[1];
+    act(() => {
+      actions.increment();
+    });
+    expect(hookValueB[0]).toBe(1);
+
+    componentB.unmount();
   });
 
   it('subscribes ALL components that use the hook', () => {

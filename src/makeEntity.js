@@ -4,6 +4,7 @@ import useEntity from './useEntity';
 export const createSetState = entity => {
   return updates => {
     entity.state = { ...entity.state, ...updates };
+
     for (let i = 0; i < entity.subscribers.length; i++) {
       if (typeof entity.subscribers[i] === 'function')
         entity.subscribers[i](entity.state);
@@ -49,7 +50,7 @@ export const makeEntity = ({ initialState, ...actions }, deps) => {
   const id = reserveNextEntityId();
   createEntity(id, initialState, actions, deps);
 
-  return () => useEntity(id);
+  return selector => useEntity(id, selector);
 };
 
 export default makeEntity;
