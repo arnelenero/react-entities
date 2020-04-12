@@ -11,7 +11,7 @@ Here are some benefits of using React Entities:
 - No explicit container (i.e. "store") or providers
 - Made specifically for React, and built on React Hooks 
 - Works 3x faster than useContext + useReducer solution
-- It's tiny, only about 1 KB
+- It's tiny, only about 1 KB (minified + gzipped)
 
 If you know React Hooks, you'll be coding React Entities in no time at all.
 
@@ -137,7 +137,7 @@ export const initialState = {
   config: null
 };
 
-export loadConfig = settings => async () => {
+export const loadConfig = settings => async () => {
   settings.setState({ loading: true });
 
   const res = await fetchConfig();
@@ -167,7 +167,7 @@ export const initialState = {
   config: null
 };
 
-export loadConfig = (settings, service) => async () => {
+export const loadConfig = (settings, service) => async () => {
   settings.setState({ loading: true });
 
   const res = await service.fetchConfig();
