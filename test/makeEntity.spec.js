@@ -20,6 +20,7 @@ beforeAll(() => {
     value: 0,
     wasReset: false,
     secret: '',
+    history: [],
   };
 
   const increment = counter => () => {
@@ -50,6 +51,14 @@ beforeAll(() => {
     counter.setState({ notInSchema: true });
   };
 
+  const setInvalidType = counter => () => {
+    counter.setState({ value: '1' });
+  };
+
+  const setInvalidArray = counter => () => {
+    counter.setState({ history: {} });
+  };
+
   useCounter = makeEntity(
     {
       initialState,
@@ -59,6 +68,9 @@ beforeAll(() => {
       reset,
       callService,
       hasBeenReset,
+      setInvalidProp,
+      setInvalidType,
+      setInvalidArray,
     },
     service
   );
@@ -109,10 +121,24 @@ describe('makeEntity', () => {
     expect(counter).toHaveProperty('secret', '1234');
   });
 
-  it('validates against schema derived from initial state, if `schemaFromInitialState` option is true', () => {
+  it('validates props against schema derived from initial state, if `schemaFromInitialState` option is true', () => {
     const { setInvalidProp } = hookValue[1];
     expect(() => {
       setInvalidProp();
+    }).toThrow();
+  });
+
+  it('validates types against schema derived from initial state, if `schemaFromInitialState` option is true', () => {
+    const { setInvalidType } = hookValue[1];
+    expect(() => {
+      setInvalidType();
+    }).toThrow();
+  });
+
+  it('distinguishes array from regular objects when validating types', () => {
+    const { setInvalidArray } = hookValue[1];
+    expect(() => {
+      setInvalidArray();
     }).toThrow();
   });
 });

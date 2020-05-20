@@ -29,7 +29,13 @@ export const createSetState = entity => {
 
 export const validateFromPattern = (updates, pattern) => {
   for (let key in updates) {
-    if (typeof updates[key] !== typeof pattern[key]) return false;
+    if (
+      typeof updates[key] !== typeof pattern[key] ||
+      (typeof updates[key] === 'object' &&
+        ((updates[key] instanceof Array && !(pattern[key] instanceof Array)) ||
+          (!(updates[key] instanceof Array) && pattern[key] instanceof Array)))
+    )
+      return false;
   }
   return true;
 };
