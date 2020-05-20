@@ -5,12 +5,15 @@ import { mount } from 'enzyme';
 import makeEntity from '../src/makeEntity';
 
 let hookValue = null;
+let validatedHookValue = null;
 let component = null;
 
 let useCounter = null;
+let useValidatedCounter = null;
 
 const CounterView = () => {
   hookValue = useCounter();
+  validatedHookValue = useValidatedCounter();
 
   return null;
 };
@@ -62,18 +65,23 @@ beforeAll(() => {
   useCounter = makeEntity(
     {
       initialState,
-      options: { schemaFromInitialState: true },
       increment,
       decrement,
       reset,
       callService,
       hasBeenReset,
       setInvalidProp,
-      setInvalidType,
-      setInvalidArray,
     },
     service
   );
+
+  useValidatedCounter = makeEntity({
+    initialState,
+    options: { schemaFromInitialState: true },
+    setInvalidProp,
+    setInvalidType,
+    setInvalidArray,
+  });
 });
 
 beforeEach(() => {
@@ -122,23 +130,32 @@ describe('makeEntity', () => {
   });
 
   it('validates props against schema derived from initial state, if `schemaFromInitialState` option is true', () => {
-    const { setInvalidProp } = hookValue[1];
+    const { setInvalidProp } = validatedHookValue[1];
     expect(() => {
       setInvalidProp();
     }).toThrow();
   });
 
   it('validates types against schema derived from initial state, if `schemaFromInitialState` option is true', () => {
-    const { setInvalidType } = hookValue[1];
+    const { setInvalidType } = validatedHookValue[1];
     expect(() => {
       setInvalidType();
     }).toThrow();
   });
 
   it('distinguishes array from regular objects when validating types', () => {
-    const { setInvalidArray } = hookValue[1];
+    const { setInvalidArray } = validatedHookValue[1];
     expect(() => {
       setInvalidArray();
     }).toThrow();
+  });
+
+  it('does not perform validations against initial state props if `schemaFromInitialState` option is not true', () => {
+    const { setInvalidProp } = hookValue[1];
+    act(() => {
+      setInvalidProp();
+    });
+    const counter = hookValue[0];
+    expect(counter).toHaveProperty('notInSchema', true);
   });
 });
