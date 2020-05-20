@@ -19,7 +19,7 @@ beforeAll(() => {
   const initialState = {
     value: 0,
     wasReset: false,
-    secret: null,
+    secret: '',
   };
 
   const increment = counter => () => {
@@ -46,9 +46,14 @@ beforeAll(() => {
     getSecret: () => '1234',
   };
 
+  const setInvalidProp = counter => () => {
+    counter.setState({ notInSchema: true });
+  };
+
   useCounter = makeEntity(
     {
       initialState,
+      options: { schemaFromInitialState: true },
       increment,
       decrement,
       reset,
@@ -102,5 +107,12 @@ describe('makeEntity', () => {
     });
     const counter = hookValue[0];
     expect(counter).toHaveProperty('secret', '1234');
+  });
+
+  it('validates against schema derived from initial state, if `schemaFromInitialState` option is true', () => {
+    const { setInvalidProp } = hookValue[1];
+    expect(() => {
+      setInvalidProp();
+    }).toThrow();
   });
 });

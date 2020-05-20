@@ -3,6 +3,14 @@ import useEntity from './useEntity';
 
 export const createSetState = entity => {
   return updates => {
+    // If `schemaFromInitialState` option is set, validate against
+    // schema derived from `initialState` before updating state
+    if (
+      entity.options.schemaFromInitialState &&
+      !validateFromPattern(updates, entity.state)
+    )
+      throw new Error('Invalid state update');
+
     entity.state = { ...entity.state, ...updates };
 
     for (let i = 0; i < entity.subscribers.length; i++) {
@@ -17,6 +25,13 @@ export const createSetState = entity => {
         entity.subscribers.splice(i, 1);
     }
   };
+};
+
+export const validateFromPattern = (updates, pattern) => {
+  for (let key in updates) {
+    if (typeof updates[key] !== typeof pattern[key]) return false;
+  }
+  return true;
 };
 
 export const bindActions = (actions, entity, deps) => {
@@ -34,21 +49,22 @@ export const bindActions = (actions, entity, deps) => {
   return entityActions;
 };
 
-export const createEntity = (id, initialState, actions, deps) => {
+export const createEntity = (id, initialState, actions, deps, options) => {
   const entity = (store[id] = {
     state: initialState || {},
     subscribers: [],
     reset: () => {
       entity.state = initialState;
     },
+    options: options || {},
   });
   entity.setState = createSetState(entity);
   entity.actions = bindActions(actions, entity, deps);
 };
 
-export const makeEntity = ({ initialState, ...actions }, deps) => {
+export const makeEntity = ({ initialState, options, ...actions }, deps) => {
   const id = reserveNextEntityId();
-  createEntity(id, initialState, actions, deps);
+  createEntity(id, initialState, actions, deps, options);
 
   return selector => useEntity(id, selector);
 };
