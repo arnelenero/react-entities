@@ -6,14 +6,17 @@ import makeEntity from '../src/makeEntity';
 
 let hookValue = null;
 let validatedHookValue = null;
+let serverHookValue = null;
 let component = null;
 
 let useCounter = null;
 let useValidatedCounter = null;
+let useServerData = null;
 
 const CounterView = () => {
   hookValue = useCounter();
   validatedHookValue = useValidatedCounter();
+  serverHookValue = useServerData();
 
   return null;
 };
@@ -23,8 +26,9 @@ beforeAll(() => {
     value: 0,
     wasReset: false,
     secret: '',
-    history: [],
   };
+
+  const isValidCount = update => update.value >= 0;
 
   const increment = counter => () => {
     counter.setState({ value: counter.state.value + 1 });
@@ -51,15 +55,7 @@ beforeAll(() => {
   };
 
   const setInvalidProp = counter => () => {
-    counter.setState({ notInSchema: true });
-  };
-
-  const setInvalidType = counter => () => {
-    counter.setState({ value: '1' });
-  };
-
-  const setInvalidArray = counter => () => {
-    counter.setState({ history: {} });
+    counter.setState({ value: -1 });
   };
 
   useCounter = makeEntity(
@@ -70,17 +66,19 @@ beforeAll(() => {
       reset,
       callService,
       hasBeenReset,
-      setInvalidProp,
+      id: 'Counter',
     },
     service
   );
 
   useValidatedCounter = makeEntity({
     initialState,
-    options: { schemaFromInitialState: true },
+    options: { validator: isValidCount },
     setInvalidProp,
-    setInvalidType,
-    setInvalidArray,
+  });
+
+  useServerData = makeEntity({
+    fetch: serverData => () => {},
   });
 });
 
@@ -104,6 +102,11 @@ describe('makeEntity', () => {
     expect(counter).toHaveProperty('value', 0);
   });
 
+  it('sets a default of `{}` if initial state is not defined', () => {
+    const serverData = serverHookValue[0];
+    expect(serverData).toBeInstanceOf(Object);
+  });
+
   it('passes the current state of the entity to actions in the argument object', () => {
     const { hasBeenReset } = hookValue[1];
     const wasReset = hasBeenReset();
@@ -120,6 +123,23 @@ describe('makeEntity', () => {
     expect(wasReset).toBe(true);
   });
 
+  it('requires each action to be a higher-order function', () => {
+    const invalidAction = (counter, value) => {
+      counter.setState({ value });
+    };
+    expect(() => {
+      makeEntity({
+        initialState: {},
+        invalidAction,
+      });
+    }).toThrow();
+  });
+
+  it('discards non-functions apart from `initialState` and `options` in entity spec', () => {
+    expect(hookValue[0]).not.toHaveProperty('id');
+    expect(hookValue[1]).not.toHaveProperty('id');
+  });
+
   it('allows injecting dependencies into the entity', () => {
     const { callService } = hookValue[1];
     act(() => {
@@ -129,33 +149,10 @@ describe('makeEntity', () => {
     expect(counter).toHaveProperty('secret', '1234');
   });
 
-  it('validates props against schema derived from initial state, if `schemaFromInitialState` option is true', () => {
+  it('validates state updates if a validator function is defined', () => {
     const { setInvalidProp } = validatedHookValue[1];
     expect(() => {
       setInvalidProp();
     }).toThrow();
-  });
-
-  it('validates types against schema derived from initial state, if `schemaFromInitialState` option is true', () => {
-    const { setInvalidType } = validatedHookValue[1];
-    expect(() => {
-      setInvalidType();
-    }).toThrow();
-  });
-
-  it('distinguishes array from regular objects when validating types', () => {
-    const { setInvalidArray } = validatedHookValue[1];
-    expect(() => {
-      setInvalidArray();
-    }).toThrow();
-  });
-
-  it('does not perform validations against initial state props if `schemaFromInitialState` option is not true', () => {
-    const { setInvalidProp } = hookValue[1];
-    act(() => {
-      setInvalidProp();
-    });
-    const counter = hookValue[0];
-    expect(counter).toHaveProperty('notInSchema', true);
   });
 });

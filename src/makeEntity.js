@@ -3,12 +3,8 @@ import useEntity from './useEntity';
 
 export const createSetState = entity => {
   return updates => {
-    // If `schemaFromInitialState` option is set, validate against
-    // schema derived from `initialState` before updating state
-    if (
-      entity.options.schemaFromInitialState &&
-      !validateFromPattern(updates, entity.state)
-    )
+    const validator = entity.options.validator;
+    if (typeof validator === 'function' && !validator(updates))
       throw new Error('Invalid state update');
 
     entity.state = { ...entity.state, ...updates };
@@ -25,19 +21,6 @@ export const createSetState = entity => {
         entity.subscribers.splice(i, 1);
     }
   };
-};
-
-export const validateFromPattern = (updates, pattern) => {
-  for (let key in updates) {
-    if (
-      typeof updates[key] !== typeof pattern[key] ||
-      (typeof updates[key] === 'object' &&
-        ((updates[key] instanceof Array && !(pattern[key] instanceof Array)) ||
-          (!(updates[key] instanceof Array) && pattern[key] instanceof Array)))
-    )
-      return false;
-  }
-  return true;
 };
 
 export const bindActions = (actions, entity, deps) => {
