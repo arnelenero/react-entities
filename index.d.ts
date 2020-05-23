@@ -8,11 +8,15 @@ export type StateSetter<S = object> = (state: S) => void;
 
 export type UpdaterFn = (updates: object) => void;
 
+export interface EntityOptions {
+  validator: (updates: object) => boolean;
+}
+
 export interface Entity<S = object, F = StateSetter> {
   state: S;
   subscribers: F[];
   reset: () => void;
-  options: object;
+  options: EntityOptions;
   setState: UpdaterFn;
   actions: ActionsObject;
 }
@@ -21,7 +25,8 @@ export type ActionComposer = (entity: Entity, deps?: any) => Action;
 
 export interface EntityDefinition<S = object> {
   initialState?: S;
-  [actions: string]: ActionComposer;
+  options?: EntityOptions;
+  [actions: string]: any;
 } 
 
 export type EntityHookValue<S, T> = [S, T];
