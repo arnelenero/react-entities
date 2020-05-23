@@ -12,11 +12,12 @@ export interface Entity<S = object, F = StateSetter> {
   state: S;
   subscribers: F[];
   reset: () => void;
+  options: object;
   setState: UpdaterFn;
   actions: ActionsObject;
 }
 
-export type ActionComposer = (entity: Entity) => Action;
+export type ActionComposer = (entity: Entity, deps?: any) => Action;
 
 export interface EntityDefinition<S = object> {
   initialState?: S;
