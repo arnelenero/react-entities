@@ -28,7 +28,9 @@ beforeAll(() => {
     secret: '',
   };
 
-  const isValidCount = update => update.value >= 0;
+  const validate = update => {
+    if (update.value < 0) throw new Error('Invalid counter value');
+  };
 
   const increment = counter => () => {
     counter.setState({ value: counter.state.value + 1 });
@@ -73,7 +75,7 @@ beforeAll(() => {
 
   useValidatedCounter = makeEntity({
     initialState,
-    options: { validator: isValidCount },
+    options: { beforeSetState: validate },
     setInvalidProp,
   });
 
@@ -149,7 +151,7 @@ describe('makeEntity', () => {
     expect(counter).toHaveProperty('secret', '1234');
   });
 
-  it('validates state updates if a validator function is defined', () => {
+  it('runs the `beforeSetState` function (if defined in options) prior to each `setState`', () => {
     const { setInvalidProp } = validatedHookValue[1];
     expect(() => {
       setInvalidProp();

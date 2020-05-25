@@ -3,9 +3,8 @@ import useEntity from './useEntity';
 
 export const createSetState = entity => {
   return updates => {
-    const validator = entity.options.validator;
-    if (typeof validator === 'function' && !validator(updates))
-      throw new Error('Invalid state update');
+    const beforeSetState = entity.options.beforeSetState;
+    if (typeof beforeSetState === 'function') beforeSetState(updates);
 
     entity.state = { ...entity.state, ...updates };
 
