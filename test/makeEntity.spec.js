@@ -28,7 +28,7 @@ beforeAll(() => {
     secret: '',
   };
 
-  const validate = update => {
+  const validate = (_, update) => {
     if (update.value < 0) throw new Error('Invalid counter value');
   };
 

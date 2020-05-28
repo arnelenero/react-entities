@@ -4,7 +4,8 @@ import useEntity from './useEntity';
 export const createSetState = entity => {
   return updates => {
     const beforeSetState = entity.options.beforeSetState;
-    if (typeof beforeSetState === 'function') beforeSetState(updates);
+    if (typeof beforeSetState === 'function')
+      beforeSetState(entity.state, updates);
 
     entity.state = { ...entity.state, ...updates };
 
