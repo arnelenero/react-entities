@@ -30,7 +30,7 @@
     "prepare": "npm run clean && npm test",
     "pretest": "npm run build",
     "test": "jest",
-    "test:cov": "npm test -- --coverage"
+    "test:cov": "npm test -- --coverage && coveralls < coverage/lcov.info"
   },
   "peerDependencies": {
     "react": "^16.8.0"
@@ -47,6 +47,7 @@
     "@babel/preset-env": "^7.9.5",
     "@babel/preset-react": "^7.9.4",
     "babel-jest": "^24.9.0",
+    "coveralls": "^3.1.0",
     "cross-env": "^5.2.1",
     "enzyme": "^3.11.0",
     "enzyme-adapter-react-16": "^1.15.2",
