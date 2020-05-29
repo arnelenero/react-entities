@@ -1,5 +1,10 @@
 # React Entities
 
+[![npm](https://img.shields.io/npm/v/react-entities)](https://www.npmjs.com/package/react-entities)
+[![build](https://img.shields.io/travis/arnelenero/react-entities)](https://travis-ci.org/github/arnelenero/react-entities)
+[![coverage](https://img.shields.io/coveralls/github/arnelenero/react-entities)](https://coveralls.io/github/arnelenero/react-entities)
+[![license](https://img.shields.io/github/license/arnelenero/react-entities)](https://opensource.org/licenses/MIT)
+
 React Entities is an ultra-lightweight library that provides the simplest global state management for React apps. It takes advantage of React Hooks.
 
 Here are some benefits of using React Entities:
