@@ -211,6 +211,8 @@ export const loadConfig = (settings, service) => async () => {
 
 In the example above, the `service` would be the `configMock` passed through `makeEntity`.
 
+Beyond this example, you can inject any type of dependency into your entity, e.g. a keyed list of services, as long as all actions of that entity know how to handle it.
+
 ### Teardown of entities for app testability
 
 All the entities are stored at the module level, outside of the React component tree. For the app itself, this is not a problem. However, in testing the app, you would typically setup and teardown the App component multiple times, and therefore entities must be reset to initial state each time.
