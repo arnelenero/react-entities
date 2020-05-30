@@ -150,6 +150,35 @@ export const loadConfig = settings => async () => {
 }
 ```
 
+### Binding only relevant data to components
+
+By default, using an entity hook binds the entire state of the entity to your component. Changes made to any part of this state, even those that are not relevant to the component, would re-render your component.
+
+To circumvent this, you can pass a _selector_ function to the hook, as in this example:
+
+**MainView.js**
+```javascript
+const MainView = () => {
+  const [config, { loadConfig }] = useSettings(state => state.config);
+
+  return ( 
+    . . .
+  );
+};
+```
+In case you only require access to actions and not the entity state at all, you can use the selector `() => null` to ensure the entity never causes a re-render.
+
+**Page.js**
+```javascript
+const Page = () => {
+  const { loadConfig } = useSettings(() => null)[1];
+
+  return ( 
+    . . .
+  );
+};
+```
+
 ### Injecting dependencies into entities
 
 Sometimes you would need to mock the API calls, for example, when unit testing your entities. In scenarios like these, you can take advantage of dependency injection. The `makeEntity` function accepts an optional second argument which is passed onto your entity.
