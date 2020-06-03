@@ -1,11 +1,26 @@
-import { useState, useEffect } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 
 import store from './store';
+import { selectAll, strictEqual } from './utils';
 
-export const useEntity = (entityId, selector = state => state) => {
+export const useEntity = (
+  entityId,
+  selector = selectAll,
+  equalityFn = strictEqual
+) => {
   const entity = store[entityId];
-  const setState = useState(selector(entity.state))[1];
-  const subscriberFn = newState => setState(selector(newState));
+  const selected = selector(entity.state);
+
+  const [state, setState] = useState(selected);
+
+  const subscriberFn = useCallback(
+    newState => {
+      const newSelected = selector(newState);
+      const hasChanged = !equalityFn(state, newSelected);
+      if (hasChanged) setState(newSelected);
+    },
+    [selector]
+  );
 
   useEffect(() => {
     entity.subscribers.push(subscriberFn);
@@ -21,9 +36,9 @@ export const useEntity = (entityId, selector = state => state) => {
         }
       }
     };
-  }, []);
+  }, [subscriberFn]);
 
-  return [selector(entity.state), entity.actions];
+  return [selected, entity.actions];
 };
 
 export default useEntity;

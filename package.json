@@ -30,7 +30,8 @@
     "prepare": "npm run clean && npm test",
     "pretest": "npm run build",
     "test": "jest",
-    "test:cov": "npm test -- --coverage && coveralls < coverage/lcov.info"
+    "test:cov": "npm test -- --coverage && coveralls < coverage/lcov.info",
+    "test:cov-local": "npm test -- --coverage"
   },
   "peerDependencies": {
     "react": "^16.8.0"
