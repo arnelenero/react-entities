@@ -169,15 +169,17 @@ const MainView = () => {
 
 Whenever the entity state is updated, the selector function is invoked to provide your component the relevant data derived from the entity state. If the result of the selector call is equal to the previous result, the component will not re-render.
 
-The equality check used to compare the current vs. previous selector result is, by default, strict/reference equality, i.e. `===`. You can specify a different equality function if needed. The library provides `shallowEqual` for cases where your selector just needs to extract certain top-level properties from the entity state, as in the example below:
+The equality check used to compare the current vs. previous selector result is, by default, strict/reference equality, i.e. `===`. You can specify a different equality function if needed. The library provides `shallowEqual` for cases when your selector returns an object with top-level properties derived from the entity state, as in the example below:
 
 **MainView.js**
 ```javascript
+import { shallowEqual } from 'react-entities';
+
 const MainView = () => {
   const [settings, settingsActions] = useSettings(state => {
     return {
-      theme: state.theme,
-      featureFlags: state.featureFlags
+      theme: state.config.theme,
+      featureFlags: state.config.featureFlags
     }
   });
 
@@ -187,7 +189,7 @@ const MainView = () => {
 };
 ```
 
-In case you only require access to actions and not the entity state at all, you can use the selector `() => null` to ensure the entity never causes a re-render. This null selector is also provided by the library as `selectNone()` and is the preferred form, to avoid recreating the function on each render.
+In case you only require access to actions and not the entity state at all, you can use the selector `() => null` to ensure the entity never causes a re-render. This null selector is also provided by the library as `selectNone` and is the preferred form, to avoid recreating the function on each render.
 
 **Page.js**
 ```javascript
