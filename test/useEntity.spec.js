@@ -1,9 +1,10 @@
-import React, { useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { act } from 'react-dom/test-utils';
 import { mount } from 'enzyme';
 
 import makeEntity from '../src/makeEntity';
 import useEntityBoundary from '../src/useEntityBoundary';
+import { shallowEqual } from '../src/utils';
 
 let useEntity = null;
 let hookValue = null;
@@ -12,6 +13,7 @@ let component = null;
 let componentB = null;
 let renderCount = 0;
 let renderCountB = 0;
+let setKeyFn = null;
 
 const CounterView = () => {
   hookValue = useEntity();
@@ -25,8 +27,30 @@ const CounterView = () => {
   return null;
 };
 
-const CounterViewWithSelector = () => {
-  hookValueB = useEntity(state => state.value);
+const CounterViewWithSelector = ({ selKey = 'value' }) => {
+  hookValueB = useEntity(state => state[selKey]);
+
+  useEffect(() => {
+    renderCountB++;
+  });
+
+  return null;
+};
+
+const CounterContainer = () => {
+  const [key, setKey] = useState('value');
+  setKeyFn = setKey;
+
+  useEntityBoundary();
+
+  return <CounterViewWithSelector selKey={key} />;
+};
+
+const CounterViewWithShallowSelector = () => {
+  hookValueB = useEntity(
+    ({ value, timesReset }) => ({ value, timesReset }),
+    shallowEqual
+  );
 
   useEffect(() => {
     renderCountB++;
@@ -52,6 +76,7 @@ const NextCounterView = () => {
 beforeAll(() => {
   const initialState = {
     value: 0,
+    timesReset: 0,
     irrelevant: 'a',
   };
 
@@ -109,7 +134,38 @@ describe('useEntity', () => {
   });
 
   it('subscribes the component to changes in only the relevant fields when using selector', () => {
-    componentB = mount(<CounterViewWithSelector />);
+    componentB = mount(<CounterContainer />);
+
+    const actions = hookValueB[1];
+    const prevRenderCountB = renderCountB;
+    act(() => {
+      actions.setIrrelevant('b');
+    });
+    expect(renderCountB).toBe(prevRenderCountB);
+
+    componentB.unmount();
+  });
+
+  it('updates subscription whenever the selector changes', () => {
+    componentB = mount(<CounterContainer />);
+
+    const actions = hookValueB[1];
+    act(() => {
+      actions.increment();
+    });
+    expect(hookValueB[0]).toBe(1);
+
+    act(() => {
+      setKeyFn('timesReset');
+    });
+    // hook now uses different selector
+    expect(hookValueB[0]).toBe(0);
+
+    componentB.unmount();
+  });
+
+  it('supports shallow equality for subcription when using selector', () => {
+    componentB = mount(<CounterViewWithShallowSelector />);
 
     const actions = hookValueB[1];
     const prevRenderCountB = renderCountB;
@@ -130,7 +186,7 @@ describe('useEntity', () => {
   });
 
   it('applies the specified selector (if any) to the entity state returned', () => {
-    componentB = mount(<CounterViewWithSelector />);
+    componentB = mount(<CounterContainer />);
 
     const actions = hookValueB[1];
     act(() => {
