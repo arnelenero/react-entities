@@ -55,7 +55,7 @@ export const makeEntity = ({ initialState, options, ...actions }, deps) => {
   const id = reserveNextEntityId();
   createEntity(id, initialState, actions, deps, options);
 
-  return selector => useEntity(id, selector);
+  return (selector, equalityFn) => useEntity(id, selector, equalityFn);
 };
 
 export default makeEntity;
