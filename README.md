@@ -181,7 +181,7 @@ const MainView = () => {
       theme: state.config.theme,
       featureFlags: state.config.featureFlags
     }
-  });
+  }, shallowEqual);
 
   return ( 
     . . .
