@@ -1,6 +1,6 @@
 /* Basic selectors */
 export const selectAll = state => state;
-export const selectNone = () => null;
+export const selectNone = _ => null;
 
 /* Basic equality functions */
 export const strictEqual = (a, b) => a === b;
