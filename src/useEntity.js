@@ -19,7 +19,7 @@ export const useEntity = (
       const hasChanged = !equalityFn(state, newSelected);
       if (hasChanged) setState(newSelected);
     },
-    [selector]
+    [selector, equalityFn]
   );
 
   useEffect(() => {
