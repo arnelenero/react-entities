@@ -1,9 +1,8 @@
 import { store, reserveNextEntityId } from './store';
 import useEntity from './useEntity';
 
-export const createSetState = entity => {
+export const createSetState = (entity, beforeSetState) => {
   return updates => {
-    const beforeSetState = entity.options.beforeSetState;
     if (typeof beforeSetState === 'function')
       beforeSetState(entity.state, updates);
 
@@ -38,7 +37,10 @@ export const bindActions = (actions, entity, deps) => {
   return entityActions;
 };
 
-export const createEntity = ({ initialState, options, ...actions }, deps) => {
+export const createEntity = (
+  { initialState, options = {}, ...actions },
+  deps
+) => {
   const id = reserveNextEntityId();
   const entity = (store[id] = {
     state: initialState || {},
@@ -46,9 +48,8 @@ export const createEntity = ({ initialState, options, ...actions }, deps) => {
     reset: () => {
       entity.state = initialState;
     },
-    options: options || {},
   });
-  entity.setState = createSetState(entity);
+  entity.setState = createSetState(entity, options.beforeSetState);
   entity.actions = bindActions(actions, entity, deps);
 
   return entity;
