@@ -14,18 +14,17 @@ export interface EntityOptions<S = object> {
 
 export interface Entity<S = object, F = SubscriberFn> {
   state: S;
-  subscribers: F[];
-  reset: () => void;
-  options: EntityOptions<S>;
   setState: SetStateFn;
   actions: ActionsObject;
+  subscribers: F[];
+  reset: () => void;
 }
 
 export type ActionComposer = (entity: Entity, deps?: any) => Action;
 
 export interface EntityDefinition<S = object> {
   initialState?: S;
-  options?: EntityOptions;
+  options?: EntityOptions<S>;
   [actions: string]: any;
 } 
 
@@ -37,6 +36,7 @@ export type EntityHookValue<S, T> = [S, T];
 
 export type EntityHook<S, T> = (selector?: Selector<S>, equalityFn?: EqualityFn) => EntityHookValue<S, T>;
 
+export function createEntity<S = object>(definition: EntityDefinition<S>, deps?: any): Entity<S>;
 export function makeEntity<S = object, T = ActionsObject>(definition: EntityDefinition<S>, deps?: any): EntityHook<S, T>;
 
 export function useEntityBoundary(): void;
