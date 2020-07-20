@@ -38,7 +38,8 @@ export const bindActions = (actions, entity, deps) => {
   return entityActions;
 };
 
-export const createEntity = (id, initialState, actions, deps, options) => {
+export const createEntity = ({ initialState, options, ...actions }, deps) => {
+  const id = reserveNextEntityId();
   const entity = (store[id] = {
     state: initialState || {},
     subscribers: [],
@@ -49,13 +50,14 @@ export const createEntity = (id, initialState, actions, deps, options) => {
   });
   entity.setState = createSetState(entity);
   entity.actions = bindActions(actions, entity, deps);
+
+  return entity;
 };
 
-export const makeEntity = ({ initialState, options, ...actions }, deps) => {
-  const id = reserveNextEntityId();
-  createEntity(id, initialState, actions, deps, options);
+export const makeEntity = (definition, deps) => {
+  const entity = createEntity(definition, deps);
 
-  return (selector, equalityFn) => useEntity(id, selector, equalityFn);
+  return (selector, equalityFn) => useEntity(entity, selector, equalityFn);
 };
 
 export default makeEntity;

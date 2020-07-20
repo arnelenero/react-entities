@@ -4,11 +4,10 @@ import store from './store';
 import { selectAll, strictEqual } from './utils';
 
 export const useEntity = (
-  entityId,
+  entity,
   selector = selectAll,
   equalityFn = strictEqual
 ) => {
-  const entity = store[entityId];
   const selected = selector(entity.state);
 
   const [state, setState] = useState(selected);
