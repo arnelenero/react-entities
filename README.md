@@ -247,7 +247,7 @@ Unit testing is not the only use-case for dependency injection. It can also be u
 
 ### Unit testing of entities
 
-When we unit test our entities, ideally we would want it to be isolated from the React components that use them. For this purpose, we cannot use `makeEntity` because it returns an entity hook. Instead, we can use the drop-in replacement called `createEntity`, which follows exactly the same syntax but returns a direct reference to the hook instead.
+When we unit test our entities, ideally we would want it to be isolated from the React components that use them. For this purpose, we cannot use `makeEntity` because it returns an entity hook. Instead, we can use the drop-in replacement called `createEntity`, which follows exactly the same syntax but returns a direct reference to the entity instead.
 
 **counter.test.js**
 ```javascript
