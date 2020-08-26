@@ -14,6 +14,7 @@ Here are some benefits of using React Entities:
 - Just use functions to implement actions
 - No Context API, just straightforward hook
 - No explicit container (i.e. "store") or providers
+- Easy unit testing of app state and actions
 - Made specifically for React, and built on React Hooks 
 - Works up to 5x faster than useContext + useReducer solution
 - It's tiny, only about 1 KB (minified + gzipped)
@@ -97,23 +98,20 @@ Here is an example usage:
 
 **CounterView.js**
 ```javascript
-import React, { useCallback } from 'react';
+import React from 'react';
 
 import { useCounter } from './entities';
 
-const CounterView = () => {
+export const CounterView = () => {
   const [counter, { increment, decrement }] = useCounter();
-
-  const handleClickIncrement = useCallback(() => increment(1), []);
-  const handleClickDecrement = useCallback(() => decrement(1), []);
 
   return (
     <>
       <div>{counter.value}</div>
-      <button onClick={handleClickIncrement}>Increment</button>
-      <button onClick={handleClickDecrement}>Decrement</button>
+      <button onClick={() => increment(1)}>Increment</button>
+      <button onClick={() => decrement(1)}>Decrement</button>
     </>
-  )
+  );
 };
 ```
 
@@ -124,6 +122,12 @@ As you can see in the above example, it is typical to use the object-spread oper
 With the very straightforward, largely unopinionated approach that React Entities brings to managing app state, you have full flexibility to implement things the way you want. It works seamlessly with whatever code architecture you choose for your React app. 
 
 Here we provide some suggested patterns that you may consider for specific scenarios.
+
+[Async fetch operations within actions](#async-fetch-operations-within-actions)  
+[Binding only relevant data to components](#binding-only-relevant-data-to-components)  
+[Injecting dependencies into entities](#injecting-dependencies-into-entities)  
+[Unit testing of entities](#unit-testing-of-entities)  
+[Teardown of entities during app testing](#teardown-of-entities-during-app-testing)  
 
 ### Async fetch operations within actions
 
@@ -147,7 +151,7 @@ export const loadConfig = settings => async () => {
 
   const res = await fetchConfig();
   settings.setState({ loading: false, config: res });
-}
+};
 ```
 
 ### Binding only relevant data to components
@@ -231,14 +235,48 @@ export const loadConfig = (settings, service) => async () => {
 
   const res = await service.fetchConfig();
   settings.setState({ loading: false, config: res });
-}
+};
 ```
 
 In the example above, the `service` would be the `configMock` passed through `makeEntity`.
 
-Beyond this example, you can inject any type of dependency into your entity, e.g. a keyed list of services, as long as all actions of that entity know how to handle it.
+Beyond this example, you can inject any type of dependency into your entity, e.g. a keyed list of services, as long as all actions of that entity know how to handle it. 
 
-### Teardown of entities for app testability
+Unit testing is not the only use-case for dependency injection. It can also be used in multi-tenant web apps, or really any other cases that require different behaviors depending on the scenario.
+
+
+### Unit testing of entities
+
+When we unit test our entities, ideally we would want it to be isolated from the React components that use them. For this purpose, we cannot use `makeEntity` because it returns an entity hook. Instead, we can use the drop-in replacement called `createEntity`, which follows exactly the same syntax but returns a direct reference to the hook instead.
+
+**counter.test.js**
+```javascript
+import { createEntity } from 'react-entities';
+import * as _counter from './counter';
+
+let counter = null;
+beforeAll(() => {
+  counter = createEntity(_counter);
+});
+
+beforeEach(() => {
+  counter.reset();
+});
+
+describe('counter', () => {
+  describe('increment', () => {
+    it('increments the value of the counter', () => {
+      counter.actions.increment(1);
+      expect(counter.state.value).toBe(1);
+    });
+  });
+});
+```
+
+In the sample Jest unit test above, `createEntity` gives us the `counter` entity object. This way, we are able to trigger an action by accessing `counter.actions`, and then inspect the current state of the entity via `counter.state`. It also provides `counter.reset()` that allows us to reset the entity to its `initialState` before each test case is executed.
+
+
+### Teardown of entities during app testing
 
 All the entities are stored at the module level, outside of the React component tree. For the app itself, this is not a problem. However, in testing the app, you would typically setup and teardown the App component multiple times, and therefore entities must be reset to initial state each time.
 
