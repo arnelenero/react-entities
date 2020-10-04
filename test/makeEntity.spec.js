@@ -28,10 +28,6 @@ beforeAll(() => {
     secret: '',
   };
 
-  const validate = (_, update) => {
-    if (update.value < 0) throw new Error('Invalid counter value');
-  };
-
   const increment = counter => () => {
     counter.setState({ value: counter.state.value + 1 });
   };
@@ -41,7 +37,7 @@ beforeAll(() => {
   };
 
   const reset = counter => () => {
-    counter.setState({ value: 0, wasReset: true });
+    counter.setState({ value: counter.initialState.value, wasReset: true });
   };
 
   const callService = (counter, svc) => () => {
@@ -54,6 +50,10 @@ beforeAll(() => {
 
   const service = {
     getSecret: () => '1234',
+  };
+
+  const validate = (_, update) => {
+    if (update.value < 0) throw new Error('Invalid counter value');
   };
 
   const setInvalidProp = counter => () => {
@@ -117,12 +117,21 @@ describe('makeEntity', () => {
   });
 
   it('passes the `setState` of the entity to actions in the argument object', () => {
-    const { reset, hasBeenReset } = hookValue[1];
+    const [{ value: oldValue }, { increment }] = hookValue;
+    act(() => {
+      increment();
+    });
+    const { value } = hookValue[0];
+    expect(value).toBe(oldValue + 1);
+  });
+
+  it('passes the `initialState` of the entity to actions in the argument object', () => {
+    const { reset } = hookValue[1];
     act(() => {
       reset();
     });
-    const wasReset = hasBeenReset();
-    expect(wasReset).toBe(true);
+    const { value } = hookValue[0];
+    expect(value).toBe(0);
   });
 
   it('requires each action to be a higher-order function', () => {

@@ -44,6 +44,7 @@ export const createEntity = (
   const id = reserveNextEntityId();
   const entity = (store[id] = {
     state: initialState || {},
+    initialState,
     subscribers: [],
     reset: () => {
       entity.state = initialState;
