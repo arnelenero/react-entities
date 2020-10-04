@@ -72,7 +72,7 @@ The function `setState()` has the following familiar signature:
 ```
 entity.setState( changes )
 ```
-where `changes` is an object whose properties are shallowly merged with the current state, thus overriding the old values. 
+where `changes` is an object whose properties are __shallowly merged__ with the current state, thus overriding the old values. 
 
 
 ## Creating Entity Hooks
@@ -250,14 +250,54 @@ Beyond this example, you can inject any type of dependency into your entity, e.g
 
 Unit testing is not the only use-case for dependency injection. It can also be used in multi-tenant web apps, or really any other cases that require different behaviors depending on the scenario.
 
+### Separating "pure" state changes from actions
+
+Using _pure functions_ for managing state updates has its benefits. Since actions in React Entities can do pretty much whatever you want it to do, in some cases it would make sense, in fact ideal, to separate "pure" state changes from side effects.
+
+To make this possible, `setState()` can accept an _updater function_ with the following signature:
+```
+updaterFn(state, arg?) => changes
+```
+where `state` is the current state of the entity and the optional `arg` can be any argument. This function returns the changes that will be __shallowly merged__ with the current state by `setState()`.
+
+The `setState()` call will then have to take the form: `setState(updaterFn, updaterArg)`.
+
+In the example below, you can see that this implementation pattern gives us the benefits of pure functions: readability, predictability and reusability among others.
+
+```javascript
+export const signIn = (auth, service) => async (email, password, onError) => {
+  auth.setState(updatePendingFlag, true);
+
+  try {
+    await service.signIn(email, password);
+    auth.setState(updateAuth, authInfo);
+  } catch (err) {
+    auth.setState(updatePendingFlag, false);
+    onError(err);
+  }
+};
+
+/*** State Updates ***/
+
+const updateAuth = (state, { userId, email, role }) => {
+  return { userId, email, role, isAuthPending: false };
+};
+
+const updatePendingFlag = (state, pending) => {
+  return { isAuthPending: pending };
+};
+```
+
+**Note**: Since the entity reference that is passed onto actions always contains the up-to-date `state`, the updater functions do NOT necessarily have to be lazy-evaluated. In the above example, for instance, the `auth.setState(updatePendingFlag, true)` is just syntactic sugar for the equivalent `auth.setState(updatePendingFlag(auth.state, true))`.
+
 ### Referencing initial state inside actions
 
 The entity's `initialState` property is accessible from within actions as in the following example:
 
 ```javascript
-  export const reset = counter => () => {
-    counter.setState({ value: counter.initialState.value });
-  };
+export const reset = counter => () => {
+  counter.setState({ value: counter.initialState.value });
+};
 ```
 
 ### Action calling other actions
