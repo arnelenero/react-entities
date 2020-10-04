@@ -130,6 +130,7 @@ Here we provide some suggested patterns that you may consider for specific scena
 [Async fetch operations within actions](#async-fetch-operations-within-actions)  
 [Binding only relevant data to components](#binding-only-relevant-data-to-components)  
 [Injecting dependencies into entities](#injecting-dependencies-into-entities)  
+[Separating "pure" state changes from actions](#separating-pure-state-changes-from-actions)  
 [Referencing initial state inside actions](#referencing-initial-state-inside-actions)  
 [Action calling other actions](#action-calling-other-actions)  
 [Unit testing of entities](#unit-testing-of-entities)  
