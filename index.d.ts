@@ -6,7 +6,9 @@ export interface ActionsObject {
 
 export type SubscriberFn<S = object> = (state: S) => void;
 
-export type SetStateFn = (updates: object) => void;
+export type UpdaterFn<S = object> = (state: S, arg: any) => object;
+
+export type SetStateFn<S = object> = (updates: object | UpdaterFn<S>) => void;
 
 export interface EntityOptions<S = object> {
   beforeSetState: (state: S, updates: object) => void;
@@ -14,7 +16,8 @@ export interface EntityOptions<S = object> {
 
 export interface Entity<S = object, F = SubscriberFn> {
   state: S;
-  setState: SetStateFn;
+  initialState: S;
+  setState: SetStateFn<S>;
   actions: ActionsObject;
   subscribers: F[];
   reset: () => void;
