@@ -2,7 +2,10 @@ import { store, reserveNextEntityId } from './store';
 import useEntity from './useEntity';
 
 export const createSetState = (entity, beforeSetState) => {
-  return updates => {
+  return (updates, updaterArg) => {
+    if (typeof updates === 'function')
+      updates = updates(entity.state, updaterArg);
+
     if (typeof beforeSetState === 'function')
       beforeSetState(entity.state, updates);
 

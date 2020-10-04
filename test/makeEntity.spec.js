@@ -32,16 +32,16 @@ beforeAll(() => {
     counter.setState({ value: counter.state.value + 1 });
   };
 
+  const decrementBy = (state, by) => {
+    return { value: state.value - by };
+  };
+
   const decrement = counter => () => {
-    counter.setState({ value: counter.state.value - 1 });
+    counter.setState(decrementBy, 1);
   };
 
   const reset = counter => () => {
     counter.setState({ value: counter.initialState.value, wasReset: true });
-  };
-
-  const callService = (counter, svc) => () => {
-    counter.setState({ secret: svc.getSecret() });
   };
 
   const hasBeenReset = counter => () => {
@@ -50,6 +50,10 @@ beforeAll(() => {
 
   const service = {
     getSecret: () => '1234',
+  };
+
+  const callService = (counter, svc) => () => {
+    counter.setState({ secret: svc.getSecret() });
   };
 
   const validate = (_, update) => {
@@ -123,6 +127,15 @@ describe('makeEntity', () => {
     });
     const { value } = hookValue[0];
     expect(value).toBe(oldValue + 1);
+  });
+
+  it('supports passing an updater function to `setState`', () => {
+    const [{ value: oldValue }, { decrement }] = hookValue;
+    act(() => {
+      decrement();
+    });
+    const { value } = hookValue[0];
+    expect(value).toBe(oldValue - 1);
   });
 
   it('passes the `initialState` of the entity to actions in the argument object', () => {

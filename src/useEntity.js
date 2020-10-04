@@ -1,6 +1,5 @@
 import { useState, useCallback, useEffect } from 'react';
 
-import store from './store';
 import { selectAll, strictEqual } from './utils';
 
 export const useEntity = (
