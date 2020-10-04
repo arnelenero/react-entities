@@ -6,7 +6,7 @@ export interface ActionsObject {
 
 export type SubscriberFn<S = object> = (state: S) => void;
 
-export type UpdaterFn<S = object> = (state: S, arg: any) => object;
+export type UpdaterFn<S = object> = (state: S, arg?: any) => object;
 
 export type SetStateFn<S = object> = (updates: object | UpdaterFn<S>) => void;
 
