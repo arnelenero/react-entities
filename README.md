@@ -21,12 +21,14 @@ Here are some benefits of using React Entities:
 
 If you know React Hooks, you'll be coding React Entities in no time at all.
 
+
 ## Setup
 
 To install:
 ```
 npm install react-entities
 ```
+
 
 ## Getting Started
 
@@ -70,7 +72,7 @@ The function `setState()` has the following familiar signature:
 ```
 entity.setState( changes )
 ```
-where `changes` is an object whose properties are shallowly merged with the current state, thus overriding the old values. Unlike React's `setState()`, this one doesn't have to support updater function as argument given that the `state` value available within the action itself is *always* up-to-date.
+where `changes` is an object whose properties are shallowly merged with the current state, thus overriding the old values. 
 
 
 ## Creating Entity Hooks
@@ -89,6 +91,7 @@ import * as counter from './counter';
 
 export const useCounter = makeEntity(counter);
 ```
+
 
 ## Using Entity Hooks in Components
 
@@ -116,6 +119,7 @@ export const CounterView = () => {
 ```
 
 As you can see in the above example, it is typical to use the object-spread operator to extract only the relevant actions from the entity, instead of the entire actions object.
+
 
 ## Recipes
 
@@ -244,6 +248,31 @@ Beyond this example, you can inject any type of dependency into your entity, e.g
 
 Unit testing is not the only use-case for dependency injection. It can also be used in multi-tenant web apps, or really any other cases that require different behaviors depending on the scenario.
 
+### Referencing initial state inside actions
+
+The entity's `initialState` property is accessible from within actions as in the following example:
+
+```javascript
+  export const reset = counter => () => {
+    counter.setState({ value: counter.initialState.value });
+  };
+```
+
+### Action calling other actions
+
+The `actions` list is included in the entity reference that is passed onto actions, which allows them to call other actions, as in this example:
+
+```javascript
+export const loadAndApplyTheme = (ui, service) => async () => {
+  const res = await service.fetchTheme();
+
+  ui.actions.switchTheme(res);
+};
+
+export const switchTheme = ui => theme => {
+  ui.setState({ theme });
+}
+```
 
 ### Unit testing of entities
 
@@ -274,7 +303,6 @@ describe('counter', () => {
 ```
 
 In the sample Jest unit test above, `createEntity` gives us the `counter` entity object. This way, we are able to trigger an action by accessing `counter.actions`, and then inspect the current state of the entity via `counter.state`. It also provides `counter.reset()` that allows us to reset the entity to its `initialState` before each test case is executed.
-
 
 ### Teardown of entities during app testing
 
