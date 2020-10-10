@@ -14,12 +14,12 @@ export interface EntityOptions<S = object> {
   beforeSetState: (state: S, updates: object) => void;
 }
 
-export interface Entity<S = object, F = SubscriberFn> {
+export interface Entity<S = object> {
   state: S;
   initialState: S;
   setState: SetStateFn<S>;
   actions: ActionsObject;
-  subscribers: F[];
+  subscribers: SubscriberFn<S>[];
   reset: () => void;
 }
 
