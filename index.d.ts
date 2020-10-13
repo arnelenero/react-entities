@@ -1,46 +1,60 @@
 export type Action = (...args: any[]) => any;
 
-export interface ActionsObject {
+export interface Actions {
   [actions: string]: Action;
 }
 
 export type SubscriberFn<S = object> = (state: S) => void;
 
-export type UpdaterFn<S = object> = (state: S, arg?: any) => object;
+export type UpdaterFn<S = object> = (state: S, arg?: any) => Partial<S>;
 
-export type SetStateFn<S = object> = (updates: object | UpdaterFn<S>, updaterArg?: any) => void;
+export type SetStateFn<S = object> = (
+  updates: Partial<S> | UpdaterFn<S>,
+  updaterArg?: any
+) => void;
 
 export interface EntityOptions<S = object> {
-  beforeSetState: (state: S, updates: object) => void;
+  beforeSetState: (state: S, updates: Partial<S>) => void;
 }
 
-export interface Entity<S = object> {
+export interface Entity<S = object, A = Actions> {
   state: S;
   initialState: S;
   setState: SetStateFn<S>;
-  actions: ActionsObject;
+  actions: A;
   subscribers: SubscriberFn<S>[];
   reset: () => void;
 }
 
-export type ActionComposer = (entity: Entity, deps?: any) => Action;
+export type ActionComposer<S = object, A = Actions> = (
+  entity: Entity<S, A>,
+  deps?: any
+) => Action;
 
-export interface EntityDefinition<S = object> {
+export type ActionComposers<S = objects, A = Actions> = {
+  [action in A]: ActionComposer<S, A>;
+};
+
+export interface EntityDefinition<S = object, A = Actions> {
   initialState?: S;
   options?: EntityOptions<S>;
-  [actions: string]: any;
-} 
+  [key: string]: S | EntityOptions<S> | ActionComposer<S, A>;
+}
 
-export type EqualityFn = (a: any, b: any) => boolean;
+export type EntityHook<S, A> = (
+  selector?: (state: S) => any,
+  equalityFn?: (a: any, b: any) => boolean
+) => [S, A];
 
-export type Selector<S = object> = (state: S) => any;
+export function createEntity<S = object, A = Actions>(
+  definition: EntityDefinition<S, A>,
+  deps?: any
+): Entity<S, A>;
 
-export type EntityHookValue<S, T> = [S, T];
-
-export type EntityHook<S, T> = (selector?: Selector<S>, equalityFn?: EqualityFn) => EntityHookValue<S, T>;
-
-export function createEntity<S = object>(definition: EntityDefinition<S>, deps?: any): Entity<S>;
-export function makeEntity<S = object, T = ActionsObject>(definition: EntityDefinition<S>, deps?: any): EntityHook<S, T>;
+export function makeEntity<S = object, A = Actions>(
+  definition: EntityDefinition<S, A>,
+  deps?: any
+): EntityHook<S, A>;
 
 export function useEntityBoundary(): void;
 
