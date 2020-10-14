@@ -31,8 +31,8 @@ export type ActionComposer<S = object, A = Actions> = (
   deps?: any
 ) => Action;
 
-export type ActionComposers<S = objects, A = Actions> = {
-  [action in A]: ActionComposer<S, A>;
+export type ActionComposers<S = object, A = Actions> = {
+  [action in keyof A]: ActionComposer<S, A>;
 };
 
 export interface EntityDefinition<S = object, A = Actions> {
