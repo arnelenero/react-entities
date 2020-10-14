@@ -28,7 +28,7 @@ export interface Entity<S = object, A = Actions> {
 
 export type ActionComposer<S = object, A = Actions, D = any> = (
   entity: Entity<S, A>,
-  deps?: D
+  deps: D
 ) => Action;
 
 export type ActionComposers<S = object, A = Actions, D = any> = {
