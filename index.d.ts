@@ -31,26 +31,26 @@ export type ActionComposer<S = object, A = Actions, D = any> = (
   deps: D
 ) => Action;
 
-export type ActionComposers<S = object, A = Actions, D = any> = {
-  [action in keyof A]: ActionComposer<S, A, D>;
-};
-
 export interface EntityDefinition<S = object, A = Actions, D = any> {
   initialState?: S;
   options?: EntityOptions<S>;
   [key: string]: S | EntityOptions<S> | ActionComposer<S, A, D>;
 }
 
-export type EntityHook<S = object, A = Actions> = (
-  selector?: (state: S) => any,
+export type EntityHook<S = object, A = Actions> = <T extends unknown = S>(
+  selector?: (state: S) => T,
   equalityFn?: (a: any, b: any) => boolean
-) => [S, A];
+) => [T, A];
 
 export function createEntity<S = object, A = Actions, D = any>(
   definition: EntityDefinition<S, A, D>,
   deps?: D
 ): Entity<S, A>;
 
+/**
+ * Creates an entity based on given definition, then returns a
+ * corresponding entity hook.
+ */
 export function makeEntity<S = object, A = Actions, D = any>(
   definition: EntityDefinition<S, A, D>,
   deps?: D
