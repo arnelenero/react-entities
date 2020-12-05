@@ -17,7 +17,7 @@ export const useEntity = (
       const hasChanged = !equalityFn(state, newSelected);
       if (hasChanged) setState(newSelected);
     },
-    [selector, equalityFn]
+    [selector, equalityFn, state]
   );
 
   useEffect(() => {
@@ -34,7 +34,7 @@ export const useEntity = (
         }
       }
     };
-  }, [subscriberFn]);
+  }, [subscriberFn, entity.subscribers]);
 
   return [selected, entity.actions];
 };
