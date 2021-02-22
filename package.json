@@ -1,12 +1,11 @@
 {
   "name": "react-entities",
-  "version": "1.3.0",
+  "version": "1.3.0-beta.0",
   "description": "React Entities - the simplest app state management for React",
   "keywords": [
     "react",
     "state",
     "library",
-    "redux",
     "functional",
     "hooks"
   ],
