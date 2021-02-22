@@ -56,6 +56,18 @@ export function makeEntity<S = object, A = Actions, D = any>(
   deps?: D
 ): EntityHook<S, A>;
 
+export function EntityScope(props: EntityScopeProps): JSX.Element;
+interface EntityScopeProps {
+  entities: { [name: string]: Entity<any, any> | EntityDefinition };
+  children: React.ReactNode;
+}
+
+export function useEntity<S = any, A = Actions>(
+  entity: string,
+  selector?: (state: any) => S,
+  equalityFn?: (a: any, b: any) => boolean
+): [S, A];
+
 export function useEntityBoundary(): void;
 
 export function strictEqual(a: any, b: any): boolean;

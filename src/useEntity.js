@@ -1,42 +1,15 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useContext } from 'react';
 
-import { selectAll, strictEqual } from './utils';
+import EntityContext from './EntityContext';
+import useUnscopedEntity from './useUnscopedEntity';
 
-export const useEntity = (
-  entity,
-  selector = selectAll,
-  equalityFn = strictEqual
-) => {
-  const selected = selector(entity.state);
+export const useEntity = (entity, selector, equalityFn) => {
+  const entities = useContext(EntityContext);
 
-  const [state, setState] = useState(selected);
+  if (typeof entity !== 'string' || !entities[entity])
+    throw new Error(`Invalid entity reference: ${entity}`);
 
-  const subscriberFn = useCallback(
-    newState => {
-      const newSelected = selector(newState);
-      const hasChanged = !equalityFn(state, newSelected);
-      if (hasChanged) setState(newSelected);
-    },
-    [selector, equalityFn, state]
-  );
-
-  useEffect(() => {
-    entity.subscribers.push(subscriberFn);
-    return () => {
-      for (let i = 0, c = entity.subscribers.length; i < c; i++) {
-        if (entity.subscribers[i] === subscriberFn) {
-          // Avoid causing subscribers array items to shift at this point.
-          // The subscriber invocation loop in entity (see makeEntity.js)
-          // should do the cleanup instead.
-          // Was: entity.subscribers.splice(i, 1);
-          entity.subscribers[i] = null;
-          break;
-        }
-      }
-    };
-  }, [subscriberFn, entity.subscribers]);
-
-  return [selected, entity.actions];
+  return useUnscopedEntity(entities[entity], selector, equalityFn);
 };
 
 export default useEntity;
