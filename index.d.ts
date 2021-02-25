@@ -65,7 +65,7 @@ interface EntityScopeProps {
 }
 
 export function useEntity<S = any, A = Actions>(
-  entity: string,
+  entityId: string,
   selector?: (state: any) => S,
   equalityFn?: (a: any, b: any) => boolean
 ): [S, A];
