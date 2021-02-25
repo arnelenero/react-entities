@@ -42,34 +42,62 @@ export type EntityHook<S = object, A = Actions> = <T extends unknown = S>(
   equalityFn?: (a: any, b: any) => boolean
 ) => [T, A];
 
+/**
+ * Creates an entity based on the given definition.
+ *
+ * @param definition - entity definition
+ * @param deps - optional dependencies (e.g. service)
+ */
 export function createEntity<S = object, A = Actions, D = any>(
   definition: EntityDefinition<S, A, D>,
   deps?: D
 ): Entity<S, A>;
 
 /**
- * Creates an entity based on given definition, then returns a
- * corresponding entity hook.
+ * Propagates entities down to its entire component subtree,
+ * thereby making them "scoped entities".
  */
-export function makeEntity<S = object, A = Actions, D = any>(
-  definition: EntityDefinition<S, A, D>,
-  deps?: D
-): EntityHook<S, A>;
-
-export function EntityScope(props: EntityScopeProps): JSX.Element;
-interface EntityScopeProps {
+export function EntityScope(props: {
   entities: {
-    [name: string]: Entity<any> | EntityDefinition<any>;
+    [id: string]: Entity<any> | EntityDefinition<any>;
   };
   children: React.ReactNode;
-}
+}): JSX.Element;
 
+/**
+ * Hook that returns a scoped entity's value (or its
+ * derivative via optional selector) and actions.
+ *
+ * @param entityId - the ID of the entity
+ * @param selector - optional selector function
+ * @param equalityFn - optional equality test (default: strictEqual)
+ */
 export function useEntity<S = any, A = Actions>(
   entityId: string,
   selector?: (state: any) => S,
   equalityFn?: (a: any, b: any) => boolean
 ): [S, A];
 
+/**
+ * Creates an entity based on given definition, then returns a
+ * corresponding entity hook.
+ *
+ * This is used in code patterns using unscoped entities.
+ *
+ * @param definition - entity definition
+ * @param deps - optional dependencies (e.g. service)
+ */
+export function makeEntity<S = object, A = Actions, D = any>(
+  definition: EntityDefinition<S, A, D>,
+  deps?: D
+): EntityHook<S, A>;
+
+/**
+ * Hook that automatically resets values of all entities
+ * when the component unmounts.
+ *
+ * This is used in code patterns using unscoped entities.
+ */
 export function useEntityBoundary(): void;
 
 export function strictEqual(a: any, b: any): boolean;
