@@ -40,6 +40,14 @@ beforeAll(() => {
     counter.setState(decrementBy, 1);
   };
 
+  const incrementByAndBy = (state, by, andBy) => {
+    return { value: state.value + by + andBy };
+  };
+
+  const incrementTwice = counter => (by, andBy) => {
+    counter.setState(incrementByAndBy, by, andBy);
+  };
+
   const reset = counter => () => {
     counter.setState({ value: counter.initialState.value, wasReset: true });
   };
@@ -69,6 +77,7 @@ beforeAll(() => {
       initialState,
       increment,
       decrement,
+      incrementTwice,
       reset,
       callService,
       hasBeenReset,
@@ -136,6 +145,15 @@ describe('makeEntity', () => {
     });
     const { value } = hookValue[0];
     expect(value).toBe(oldValue - 1);
+  });
+
+  it('supports multiple arguments to updater function for `setState`', () => {
+    const [{ value: oldValue }, { incrementTwice }] = hookValue;
+    act(() => {
+      incrementTwice(1, 2);
+    });
+    const { value } = hookValue[0];
+    expect(value).toBe(oldValue + 3);
   });
 
   it('passes the `initialState` of the entity to actions in the argument object', () => {
