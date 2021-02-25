@@ -257,9 +257,9 @@ Using _pure functions_ for managing state updates has its benefits. Since action
 
 To make this possible, `setState()` can accept an _updater function_ with the following signature:
 ```
-updaterFn(state, arg?) => changes
+updaterFn(state, ...args) => changes
 ```
-where `state` is the current state of the entity and the optional `arg` can be any argument. This function returns the changes that will be __shallowly merged__ with the current state by `setState()`.
+where `state` is the current state of the entity and the optional `args` can be any number of arguments. This function returns the changes that will be __shallowly merged__ with the current state by `setState()`.
 
 The `setState()` call will then have to take the form: `setState(updaterFn, updaterArg)`.
 

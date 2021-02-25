@@ -1,9 +1,9 @@
 import { store, reserveNextEntityId } from './store';
 
 export const createSetState = (entity, beforeSetState) => {
-  return (updates, updaterArg) => {
+  return (updates, ...updaterArgs) => {
     if (typeof updates === 'function')
-      updates = updates(entity.state, updaterArg);
+      updates = updates(entity.state, ...updaterArgs);
 
     if (typeof beforeSetState === 'function')
       beforeSetState(entity.state, updates);

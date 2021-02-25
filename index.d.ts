@@ -6,11 +6,11 @@ export interface Actions {
 
 export type SubscriberFn<S = object> = (state: S) => void;
 
-export type UpdaterFn<S = object> = (state: S, arg?: any) => Partial<S>;
+export type UpdaterFn<S = object> = (state: S, ...args: any[]) => Partial<S>;
 
 export type SetStateFn<S = object> = (
   updates: Partial<S> | UpdaterFn<S>,
-  updaterArg?: any
+  ...updaterArgs: any[]
 ) => void;
 
 export interface EntityOptions<S = object> {
