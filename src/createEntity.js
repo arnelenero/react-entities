@@ -15,10 +15,9 @@ export const createSetState = (entity, beforeSetState) => {
 
     // Cleanup any nullified subscribers due to possible
     // component unmounts caused by this app state change
-    for (let i = 0; i < entity.subscribers.length; i++) {
-      if (typeof entity.subscribers[i] !== 'function')
-        entity.subscribers.splice(i, 1);
-    }
+    entity.subscribers = entity.subscribers.filter(
+      item => typeof item === 'function'
+    );
   };
 };
 
