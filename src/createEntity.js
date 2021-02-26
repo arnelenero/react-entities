@@ -1,5 +1,3 @@
-import { store, reserveNextEntityId } from './store';
-
 export const createSetState = (entity, beforeSetState) => {
   return (updates, ...updaterArgs) => {
     if (typeof updates === 'function')
@@ -43,15 +41,14 @@ export const createEntity = (
   { initialState, options = {}, ...actions },
   deps
 ) => {
-  const id = reserveNextEntityId();
-  const entity = (store[id] = {
+  const entity = {
     state: initialState || {},
     initialState,
     subscribers: [],
     reset: () => {
       entity.state = initialState;
     },
-  });
+  };
   entity.setState = createSetState(entity, options.beforeSetState);
   entity.actions = bindActions(actions, entity, deps);
 
