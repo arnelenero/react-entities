@@ -169,4 +169,25 @@ describe('useEntity', () => {
     expect(renderCountB).toBe(prevRenderCountB + 1);
     expect(hookValueB[0]).toHaveProperty('value', 1);
   });
+
+  it('unsubscribes the component from the entity when it unmounts', () => {
+    mountCounter();
+
+    const actions = hookValue[1];
+    const prevRenderCount = renderCount;
+    component.unmount();
+    act(() => {
+      actions.increment();
+    });
+    expect(renderCount).toBe(prevRenderCount);
+  });
+
+  it('throws an error if no entity with the specified ID is found within scope', () => {
+    const BadComponent = () => {
+      useEntity('notFound');
+    };
+    expect(() => {
+      mountContainer(BadComponent);
+    }).toThrow();
+  });
 });
