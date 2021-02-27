@@ -60,12 +60,10 @@ describe('createEntity', () => {
 
   it('includes an `actions` object in the entity to contain action functions', () => {
     const counter = createEntity({
-      increment: entity => by => {
-        entity.setState({ value: entity.state.value + by });
-      },
+      doSomething: () => () => {},
     });
     expect(counter.actions).toBeInstanceOf(Object);
-    expect(counter.actions.increment).toBeInstanceOf(Function);
+    expect(counter.actions.doSomething).toBeInstanceOf(Function);
   });
 
   it('requires each action definition to be a higher-order function', () => {
@@ -76,6 +74,49 @@ describe('createEntity', () => {
         },
       });
     }).toThrow();
+  });
+
+  it('passes a reference to the entity, including its `state` and `setState` to each action', () => {
+    const counter = createEntity({
+      initialState: { value: 0 },
+      increment: entity => by => {
+        entity.setState({ value: entity.state.value + by });
+      },
+      reset: entity => () => {
+        entity.setState(entity.initialState);
+      },
+    });
+    counter.actions.increment(2);
+    expect(counter.state).toHaveProperty('value', 2);
+  });
+
+  it('includes the `initialState` in the entity reference passed to actions', () => {
+    const counter = createEntity({
+      initialState: { value: 0 },
+      increment: entity => by => {
+        entity.setState({ value: entity.state.value + by });
+      },
+      reset: entity => () => {
+        entity.setState(entity.initialState);
+      },
+    });
+    counter.actions.increment(2);
+    counter.actions.reset();
+    expect(counter.state).toHaveProperty('value', 0);
+  });
+
+  it('includes the `actions` in the entity reference passed to actions', () => {
+    const counter = createEntity({
+      initialState: { value: 0 },
+      increment: entity => by => {
+        entity.setState({ value: entity.state.value + by });
+      },
+      up: entity => () => {
+        entity.actions.increment(1);
+      },
+    });
+    counter.actions.up();
+    expect(counter.state).toHaveProperty('value', 1);
   });
 
   it('discards non-functions apart from `initialState` and `options` in entity definition', () => {

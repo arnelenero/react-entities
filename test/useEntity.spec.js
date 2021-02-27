@@ -2,129 +2,83 @@ import React, { useState, useEffect } from 'react';
 import { act } from 'react-dom/test-utils';
 import { mount } from 'enzyme';
 
-import makeEntity from '../src/makeEntity';
-import useEntityBoundary from '../src/useEntityBoundary';
+import useEntity from '../src/useEntity';
+import EntityScope from '../src/EntityScope';
 import { shallowEqual } from '../src/utils';
 
-let useEntity = null;
-let hookValue = null;
-let hookValueB = null;
-let component = null;
-let componentB = null;
-let renderCount = 0;
-let renderCountB = 0;
-let setKeyFn = null;
-
-const CounterView = () => {
-  hookValue = useEntity();
-
-  useEffect(() => {
-    renderCount++;
-  });
-
-  useEntityBoundary();
-
-  return null;
-};
-
-const CounterViewWithSelector = ({ selKey = 'value' }) => {
-  hookValueB = useEntity(state => state[selKey]);
-
-  useEffect(() => {
-    renderCountB++;
-  });
-
-  return null;
-};
-
-const CounterContainer = () => {
-  const [key, setKey] = useState('value');
-  setKeyFn = setKey;
-
-  useEntityBoundary();
-
-  return <CounterViewWithSelector selKey={key} />;
-};
-
-const CounterViewWithShallowSelector = () => {
-  hookValueB = useEntity(
-    ({ value, timesReset }) => ({ value, timesReset }),
-    shallowEqual
-  );
-
-  useEffect(() => {
-    renderCountB++;
-  });
-
-  useEntityBoundary();
-
-  return null;
-};
-
-const NextCounterView = () => {
-  hookValueB = useEntity();
-
-  useEffect(() => {
-    renderCountB++;
-  });
-
-  useEntityBoundary();
-
-  return null;
-};
-
-beforeAll(() => {
-  const initialState = {
-    value: 0,
-    timesReset: 0,
-    irrelevant: 'a',
-  };
-
-  const increment = counter => () => {
-    counter.setState({ value: counter.state.value + 1 });
-  };
-
-  const decrement = counter => () => {
-    counter.setState({ value: counter.state.value - 1 });
-  };
-
-  const setIrrelevant = counter => val => {
-    counter.setState({ irrelevant: val });
-  };
-
-  useEntity = makeEntity({ initialState, increment, decrement, setIrrelevant });
-});
-
-beforeEach(() => {
-  component = mount(<CounterView />);
-});
-
-afterEach(() => {
-  if (component.exists()) component.unmount();
-});
-
 describe('useEntity', () => {
-  it('returns an array of 2 items', () => {
+  const counter = {
+    initialState: { value: 0, lastUpdated: new Date() },
+    increment: entity => (by = 1) => {
+      entity.setState({
+        value: entity.state.value + by,
+        lastUpdated: new Date(),
+      });
+    },
+    touch: entity => () => entity.setState({ lastUpdated: new Date() }),
+  };
+
+  const mountContainer = (ChildA, ChildB) => {
+    component = mount(
+      <EntityScope entities={{ counter }}>
+        <ChildA />
+        {ChildB && <ChildB />}
+      </EntityScope>
+    );
+  };
+
+  const counterView = (selectKey, equalityFn) => {
+    const CounterView = () => {
+      const [key, setKey] = useState(selectKey);
+      const selector = key
+        ? equalityFn === shallowEqual
+          ? state => {
+              return { [key]: state[key] };
+            }
+          : state => state[key]
+        : undefined;
+      setSelectKey = setKey; // Allows modifying the selector key from outside
+
+      hookValue = useEntity('counter', selector, equalityFn);
+
+      useEffect(() => {
+        renderCount++;
+      });
+
+      return <></>;
+    };
+
+    return CounterView;
+  };
+
+  const mountCounter = (selectKey, equalityFn) => {
+    mountContainer(counterView(selectKey, equalityFn));
+  };
+
+  let component = null;
+  let renderCount = 0;
+  let hookValue = null;
+  let setSelectKey = null;
+
+  afterEach(() => {
+    if (component.exists()) component.unmount();
+  });
+
+  it('returns the tuple [state, actions] of the entity', () => {
+    mountCounter();
+
     expect(hookValue).toBeInstanceOf(Array);
     expect(hookValue).toHaveLength(2);
+    expect(hookValue[0]).toBeInstanceOf(Object);
+    expect(hookValue[0]).toHaveProperty('value', 0);
+    expect(hookValue[1]).toBeInstanceOf(Object);
+    expect(hookValue[1]).toHaveProperty('increment');
+    expect(hookValue[1].increment).toBeInstanceOf(Function);
   });
 
-  it('returns the entity state object as the first item', () => {
-    const state = hookValue[0];
-    expect(state).toBeInstanceOf(Object);
-    expect(state).toHaveProperty('value');
-  });
+  it('re-renders the component on each change in entity state caused by an action', () => {
+    mountCounter();
 
-  it('returns the actions object as the second item', () => {
-    const actions = hookValue[1];
-    expect(actions).toBeInstanceOf(Object);
-    expect(actions).toHaveProperty('increment');
-    expect(actions.increment).toBeInstanceOf(Function);
-    expect(actions).toHaveProperty('decrement');
-    expect(actions.decrement).toBeInstanceOf(Function);
-  });
-
-  it('subscribes the component to changes in entity state caused by an action', () => {
     const actions = hookValue[1];
     const prevRenderCount = renderCount;
     act(() => {
@@ -133,51 +87,9 @@ describe('useEntity', () => {
     expect(renderCount).toBe(prevRenderCount + 1);
   });
 
-  it('subscribes the component to changes in only the relevant fields when using selector', () => {
-    componentB = mount(<CounterContainer />);
+  it('always provides the updated entity state to the component', () => {
+    mountCounter();
 
-    const actions = hookValueB[1];
-    const prevRenderCountB = renderCountB;
-    act(() => {
-      actions.setIrrelevant('b');
-    });
-    expect(renderCountB).toBe(prevRenderCountB);
-
-    componentB.unmount();
-  });
-
-  it('updates subscription whenever the selector changes', () => {
-    componentB = mount(<CounterContainer />);
-
-    const actions = hookValueB[1];
-    act(() => {
-      actions.increment();
-    });
-    expect(hookValueB[0]).toBe(1);
-
-    act(() => {
-      setKeyFn('timesReset');
-    });
-    // hook now uses different selector
-    expect(hookValueB[0]).toBe(0);
-
-    componentB.unmount();
-  });
-
-  it('supports shallow equality for subcription when using selector', () => {
-    componentB = mount(<CounterViewWithShallowSelector />);
-
-    const actions = hookValueB[1];
-    const prevRenderCountB = renderCountB;
-    act(() => {
-      actions.setIrrelevant('b');
-    });
-    expect(renderCountB).toBe(prevRenderCountB);
-
-    componentB.unmount();
-  });
-
-  it('always provides the updated entity state to the subscribed component', () => {
     const actions = hookValue[1];
     act(() => {
       actions.increment();
@@ -185,20 +97,66 @@ describe('useEntity', () => {
     expect(hookValue[0]).toHaveProperty('value', 1);
   });
 
-  it('applies the specified selector (if any) to the entity state returned', () => {
-    componentB = mount(<CounterContainer />);
+  it('subscribes the component to changes in only the relevant fields when using selector', () => {
+    mountCounter('value');
 
-    const actions = hookValueB[1];
+    const actions = hookValue[1];
+    const prevRenderCount = renderCount;
+    act(() => {
+      actions.touch();
+    });
+    expect(renderCount).toBe(prevRenderCount);
+  });
+
+  it('applies the selector (if any) to the entity state provided to the component', () => {
+    mountCounter('value');
+
+    const actions = hookValue[1];
     act(() => {
       actions.increment();
     });
-    expect(hookValueB[0]).toBe(1);
-
-    componentB.unmount();
+    expect(hookValue[0]).toBe(1);
   });
 
-  it('subscribes ALL components that use the hook', () => {
-    componentB = mount(<NextCounterView />);
+  it('updates subscription whenever the selector changes', () => {
+    mountCounter('value');
+
+    const actions = hookValue[1];
+    act(() => {
+      actions.increment();
+    });
+    expect(hookValue[0]).toBe(1);
+
+    act(() => {
+      setSelectKey('lastUpdated');
+    });
+    // hook now uses a different selector
+    expect(hookValue[0]).toBeInstanceOf(Date);
+  });
+
+  it('supports shallow equality for subcription when using selector', () => {
+    mountCounter('value', shallowEqual);
+
+    const actions = hookValue[1];
+    const prevRenderCount = renderCount;
+    act(() => {
+      actions.touch();
+    });
+    expect(renderCount).toBe(prevRenderCount);
+  });
+
+  it('subscribes all components that use the hook', () => {
+    let renderCountB = 0;
+    let hookValueB = null;
+    const CounterB = () => {
+      hookValueB = useEntity('counter');
+      useEffect(() => {
+        renderCountB++;
+      });
+      return <></>;
+    };
+
+    mountContainer(counterView(), CounterB);
 
     const actions = hookValue[1];
     const prevRenderCount = renderCount;
@@ -210,17 +168,5 @@ describe('useEntity', () => {
     expect(hookValue[0]).toHaveProperty('value', 1);
     expect(renderCountB).toBe(prevRenderCountB + 1);
     expect(hookValueB[0]).toHaveProperty('value', 1);
-
-    componentB.unmount();
-  });
-
-  it('unsubscribes the component when it unmounts', () => {
-    const actions = hookValue[1];
-    const prevRenderCount = renderCount;
-    component.unmount();
-    act(() => {
-      actions.increment();
-    });
-    expect(renderCount).toBe(prevRenderCount);
   });
 });
