@@ -183,11 +183,16 @@ describe('useEntity', () => {
   });
 
   it('throws an error if no entity with the specified ID is found within scope', () => {
+    const origConsoleError = console.error;
+    console.error = jest.fn();
+
     const BadComponent = () => {
       useEntity('notFound');
     };
     expect(() => {
       mountContainer(BadComponent);
     }).toThrow();
+
+    console.error = origConsoleError;
   });
 });

@@ -3,9 +3,6 @@ import { createEntity } from './createEntity';
 import EntityContext from './EntityContext';
 
 export const EntityScope = ({ entities, children }) => {
-  if (typeof entities !== 'object')
-    throw new Error('EntityScope expects `entities` prop of object type.');
-
   const inheritedEntities = useContext(EntityContext);
   entities = { ...inheritedEntities, ...entities };
 

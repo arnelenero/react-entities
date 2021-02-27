@@ -4,14 +4,25 @@ import { mount } from 'enzyme';
 import makeEntity from '../src/makeEntity';
 
 describe('makeEntity', () => {
-  const useCounter = makeEntity({
+  const counter = {
     initialState: { value: 0 },
     increment: entity => by => {
       entity.setState({ value: entity.state.value + by });
     },
-  });
+  };
+
+  const mountCounter = () => {
+    useCounter = makeEntity(counter);
+
+    const CounterView = () => {
+      hookValue = useCounter();
+      return <></>;
+    };
+    component = mount(<CounterView />);
+  };
 
   let component = null;
+  let useCounter = null;
   let hookValue = null;
 
   afterEach(() => {
@@ -19,11 +30,7 @@ describe('makeEntity', () => {
   });
 
   it('returns an entity hook function that returns the tuple [state, actions]', () => {
-    const CounterView = () => {
-      hookValue = useCounter();
-      return <></>;
-    };
-    component = mount(<CounterView />);
+    mountCounter();
 
     expect(useCounter).toBeInstanceOf(Function);
     expect(hookValue).toBeInstanceOf(Array);
