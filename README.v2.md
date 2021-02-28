@@ -38,7 +38,7 @@ Apart from state, each entity would also have _actions_, which are just normal f
 A typical entity definition would be a regular module that exports an initial state and several action functions. Here's a simple example:
 
 **entities/counter.js**
-```javascript
+```js
 export const initialState = {
   value: 0
 };
@@ -51,6 +51,38 @@ export const decrement = counter => by => {
   counter.setState({ value: counter.state.value - by });
 };
 ```
+
+<details>
+  <summary>TypeScript version</summary><br/>
+
+**entities/counter.ts**
+```ts
+import { Entity } from 'react-entities';
+
+export interface Counter {
+  value: number;
+};
+
+export interface CounterActions {
+  increment: (by: number) => void;
+  decrement: (by: number) => void;
+};
+
+export type CounterEntity = Entity<Counter, CounterActions>;
+
+export const initialState: Counter = {
+  value: 0
+};
+
+export const increment = (counter: CounterEntity) => (by: number) => {
+  counter.setState({ value: counter.state.value + by });
+};
+
+export const decrement = (counter: CounterEntity) => (by: number) => {
+  counter.setState({ value: counter.state.value - by });
+};
+```
+</details><br/>   
 
 ### Defining the initial state
 
@@ -79,7 +111,7 @@ where `updates` is an object whose properties are __shallowly merged__ with the 
 Before we can access an entity in our components, we need to attach it to a _scope_. The `<EntityScope>` component propagates entities down its entire component subtree.
 
 **App.js**
-```javascript
+```jsx
 import { EntityScope } from 'react-entities';
 import * as counter from './entities/counter';
 
@@ -93,6 +125,8 @@ const App = () => {
   <Footer />
 }
 ```
+(TypeScript version is the same)
+
 In the example above, `<CounterView>` and all its descendant components have access to the `counter` entity, while `<Header>` and `<Footer>`, and everything else outside the scope, do not.
 
 We can attach any number of entities to a single `<EntityScope>`. The `entities` prop is an object that maps each entity to an ID that can be used to access the entity in components within the scope. In our example above, the entity becomes accessible using the entity ID `'counter'`.
@@ -105,7 +139,7 @@ The `useEntity` hook allows us to bind an entity to a component. It takes an ent
 Here is an example usage:
 
 **CounterView.js**
-```javascript
+```jsx
 import { useEntity } from 'react-entities';
 
 export const CounterView = () => {
@@ -134,7 +168,7 @@ It is simplest to have a single entity scope for all our entities at the top-lev
 
 If you attach the same entity to multiple scopes, each scope will propagate a __separate instance__ of the entity, even if you use the same entity ID across these scopes. When used in a component, that ID then refers to the instance at the nearest scope up the hierarchy.
 
-```javascript
+```jsx
 const App = () => {
   <EntityScope entities={{ counter, settings }}>
     <Banner />
