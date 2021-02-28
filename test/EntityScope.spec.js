@@ -3,15 +3,15 @@ import { mount } from 'enzyme';
 
 import EntityScope from '../src/EntityScope';
 import useEntity from '../src/useEntity';
-import createEntity from '../src/createEntity';
 
 describe('EntityScope', () => {
   const counter = {
     initialState: { value: 0 },
-    increment: entity => (by = 1) => {
+    increment: (entity, logger) => (by = 1) => {
       entity.setState({
         value: entity.state.value + by,
       });
+      if (logger) logger.log();
     },
   };
 
@@ -50,18 +50,6 @@ describe('EntityScope', () => {
     expect(hookValue).toBeDefined();
   });
 
-  it('also accepts manually created entities in its `entities` prop', () => {
-    component = mount(
-      <EntityScope entities={{ counter: createEntity(counter) }}>
-        <div>
-          <CounterView />
-        </div>
-      </EntityScope>
-    );
-
-    expect(hookValue).toBeDefined();
-  });
-
   it('does not allow access to its scoped entities outside of its subtree', () => {
     expect(() => {
       component = mount(
@@ -75,15 +63,52 @@ describe('EntityScope', () => {
     }).toThrow();
   });
 
-  it('inherits entities from a parent EntityScope (if any)', () => {
+  it('inherits entities from an outer EntityScope (if any)', () => {
     component = mount(
       <EntityScope entities={{ counter }}>
-        <EntityScope entities={{ timer: createEntity({}) }}>
+        <EntityScope entities={{ timer: {} }}>
           <CounterView />
         </EntityScope>
       </EntityScope>
     );
 
     expect(hookValue).toBeDefined();
+  });
+
+  it('overrides entities that use the same ID as in an outer EntityScope', () => {
+    let outerHookValue = null;
+    const OuterView = () => {
+      outerHookValue = useEntity('counter');
+      return <></>;
+    };
+
+    component = mount(
+      <EntityScope entities={{ counter }}>
+        <OuterView />
+        <EntityScope entities={{ counter }}>
+          <CounterView />
+        </EntityScope>
+      </EntityScope>
+    );
+
+    hookValue[1].increment();
+    expect(hookValue[0]).toHaveProperty('value', 1);
+    expect(outerHookValue[0]).toHaveProperty('value', 0);
+  });
+
+  it('supports injecting dependencies to entities', () => {
+    const silentLogger = {
+      log: jest.fn(),
+    };
+    component = mount(
+      <EntityScope entities={{ counter: [counter, silentLogger] }}>
+        <div>
+          <CounterView />
+        </div>
+      </EntityScope>
+    );
+
+    hookValue[1].increment(1);
+    expect(silentLogger.log).toHaveBeenCalled();
   });
 });

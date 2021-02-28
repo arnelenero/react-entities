@@ -59,7 +59,7 @@ export function createEntity<S = object, A = Actions, D = any>(
  */
 export function EntityScope(props: {
   entities: {
-    [id: string]: Entity<any> | EntityDefinition<any>;
+    [id: string]: EntityDefinition<any> | [ EntityDefinition<any>, any ];
   };
   children: React.ReactNode;
 }): JSX.Element;

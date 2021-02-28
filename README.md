@@ -316,6 +316,8 @@ export const switchTheme = ui => theme => {
   ui.setState({ theme });
 }
 ```
+__Why not reference `switchTheme` directly?__ Remember that the action definition here is a composer function, whereas the final composed action that we invoke at runtime is just a normal function.
+
 
 ### Unit testing of entities
 
