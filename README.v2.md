@@ -10,11 +10,13 @@ React Entities is an ultra-lightweight library that provides the simplest state 
 ## Why React Entities?
 
 Here are some of the benefits of using React Entities:
-- No complex constructs or boilerplate 
+- No complicated constructs or boilerplate 
 - No steep learning curve
-- Uses plain functions to implement actions
+- Uses plain functions to implement state changes
 - Largely unopinionated and flexible syntax
+- Full TypeScript support
 - Made specifically for React, and built on React Hooks 
+- Production-grade, well-documented, actively supported
 - It's tiny, only about 1 KB (minified + gzipped)
 
 
@@ -59,6 +61,8 @@ export const decrement = counter => by => {
 ```ts
 import { Entity } from 'react-entities';
 
+/** Types **/
+
 export interface Counter {
   value: number;
 };
@@ -69,6 +73,8 @@ export interface CounterActions {
 };
 
 export type CounterEntity = Entity<Counter, CounterActions>;
+
+/** Implementation **/
 
 export const initialState: Counter = {
   value: 0
@@ -82,7 +88,8 @@ export const decrement = (counter: CounterEntity) => (by: number) => {
   counter.setState({ value: counter.state.value - by });
 };
 ```
-</details><br/>   
+
+</details>
 
 ### Defining the initial state
 
