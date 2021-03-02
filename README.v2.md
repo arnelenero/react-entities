@@ -162,6 +162,28 @@ export const CounterView = () => {
 };
 ```
 
+<details>
+  <summary>TypeScript version</summary><br/>
+
+**CounterView.tsx**
+```tsx
+import { useEntity } from 'react-entities';
+import { Counter, CounterView } from './entities/counter';
+
+export const CounterView = () => {
+  const [counter, { increment, decrement }] = useEntity<Counter, CounterActions>('counter');
+
+  return (
+    <>
+      <div>{counter.value}</div>
+      <button onClick={() => increment(1)}>Increment</button>
+      <button onClick={() => decrement(1)}>Decrement</button>
+    </>
+  );
+};
+```
+
+</details>
 
 ## Recipes
 
@@ -176,15 +198,20 @@ It is simplest to have a single entity scope for all our entities at the top-lev
 If you attach the same entity to multiple scopes, each scope will propagate a __separate instance__ of the entity, even if you use the same entity ID across these scopes. When used in a component, that ID then refers to the instance at the nearest scope up the hierarchy.
 
 ```jsx
+import * as counter from './entities/counter';
+import * as settings from './entities/settings';
+
 const App = () => {
   <EntityScope entities={{ counter, settings }}>
-    <Banner />
+    <CounterView />
 
     <EntityScope entities={{ counter }}>
-        <CounterView />
+        <SubCounterView />
     </EntityScope>
   </EntityScope>
 }
 ```
-In our example above, `settings` is accessible to both `<Banner>` and `<CounterView>`, while each of those components will "see" a different `counter`.
+(TypeScript version is the same)
+
+In our example above, `settings` is accessible to both `<CounterView>` and `<SubCounterView>`, while each of those components will "see" a different `counter`.
 

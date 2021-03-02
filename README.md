@@ -291,6 +291,22 @@ const updatePendingFlag = (state, pending) => {
 
 **Note**: Since the entity reference that is passed onto actions always contains the up-to-date `state`, the updater functions do NOT necessarily have to be lazy-evaluated. In the above example, for instance, the `auth.setState(updatePendingFlag, true)` is just syntactic sugar for the equivalent `auth.setState(updatePendingFlag(auth.state, true))`.
 
+Pure state updaters can also be nested to encourage modularity, like in this example:
+```js
+const updateAuth = (state, { userId, email, role }) => {
+  return { 
+    userId, 
+    email, 
+    role, 
+    ...updatePendingFlag(state, false) 
+  };
+};
+
+const updatePendingFlag = (state, pending) => {
+  return { isAuthPending: pending };
+};
+```
+
 ### Referencing initial state inside actions
 
 The entity's `initialState` property is accessible from within actions as in the following example:
