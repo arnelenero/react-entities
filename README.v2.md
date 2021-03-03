@@ -279,6 +279,7 @@ This is achieved by pairing the entity with its dependencies as a tuple in the `
 
 **App.js**
 ```jsx
+import { EntityScope } from 'react-entities';
 import * as counter from './entities/counter';
 import * as settings from './entities/settings';
 import * as configService from './services/configService'; 
@@ -320,6 +321,7 @@ It is simplest to have a single entity scope for all our entities at the top-lev
 If you attach the same entity to multiple scopes, each scope will propagate a __separate instance__ of the entity, even if you use the same entity ID across these scopes. When used in a component, that ID then refers to the instance at the nearest scope up the hierarchy.
 
 ```jsx
+import { EntityScope } from 'react-entities';
 import * as counter from './entities/counter';
 import * as settings from './entities/settings';
 
