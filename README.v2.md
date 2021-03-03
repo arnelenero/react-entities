@@ -227,9 +227,9 @@ import { useEntity } from 'react-entities';
 
 const MainView = () => {
   const [config, { loadConfig }] = useEntity('settings', state => state.config);
-  //                                                     ‾‾‾‾‾‾👆̅‾‾‾‾‾‾‾‾‾‾‾‾‾
+  //                                                           👆
   return ( 
-    . . .
+  //  . . .
   );
 };
 ```
@@ -251,7 +251,7 @@ const MainView = () => {
   }, shallowEqual);
   //      👆
   return ( 
-    . . .
+  //  . . .
   );
 };
 ```
