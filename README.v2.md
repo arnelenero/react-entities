@@ -30,7 +30,7 @@ npm install react-entities
 
 ## What is an Entity?
 
-An _entity_ is a single-concern data object whose _state_ can be bound to any number of components in the app. In this sense it is a "shared" state. Once bound to a component, an entity's state acts like local state, i.e. it causes the component to update on every change.
+An _entity_ is a single-concern data object whose _state_ can be bound to any number of components in the app as a "shared" state. Once bound to a component, an entity's state acts like local state, i.e. it causes the component to update on every change.
 
 Apart from state, each entity would also have _actions_, which are just normal functions that make changes to the entity's state.
 
@@ -168,7 +168,7 @@ export const CounterView = () => {
 **CounterView.tsx**
 ```tsx
 import { useEntity } from 'react-entities';
-import { Counter, CounterView } from './entities/counter';
+import { Counter, CounterActions } from './entities/counter';
 
 export const CounterView = () => {
   const [counter, { increment, decrement }] = useEntity<Counter, CounterActions>('counter');
@@ -185,11 +185,133 @@ export const CounterView = () => {
 
 </details>
 
+
 ## Recipes
 
 With the very straightforward, largely unopinionated approach that React Entities brings to managing app state, you have full flexibility to implement things the way you want. It works seamlessly with whatever code architecture you choose for your React app. 
 
 Here we provide some suggested patterns that you may consider for specific scenarios.
+
+### Async actions
+
+A typical action makes state changes then immediately terminates. However, since actions are just plain functions, they can contain any operations, including async ones. This gives us the flexibility of implementing things like async data fetches inside actions.
+
+Here is an example using `async/await` for async action:
+
+**entities/settings.js**
+```js
+import { fetchConfig } from './configService';
+
+export const initialState = {
+  loading: false,
+  config: null
+};
+//                                      👇
+export const loadConfig = settings => async () => {
+  settings.setState({ loading: true });
+
+  const res = await fetchConfig();
+  settings.setState({ loading: false, config: res });
+};
+```
+
+### Binding only relevant data to a component
+
+By default, the `useEntity` hook binds the entire state of the entity to our component. Changes made to any part of this state, even those that are not relevant to the component, would cause a re-render.
+
+To circumvent this, we can pass a _selector_ function to the hook, as in this example:
+
+**MainView.js**
+```js
+import { useEntity } from 'react-entities';
+
+const MainView = () => {
+  const [config, { loadConfig }] = useEntity('settings', state => state.config);
+  //                                                     ‾‾‾‾‾‾👆̅‾‾‾‾‾‾‾‾‾‾‾‾‾
+  return ( 
+    . . .
+  );
+};
+```
+
+Whenever the entity state is updated, the selector function is invoked to provide our component only the relevant data derived from the state. If the result of the selector is equal to the previous result, the component will not re-render.
+
+The equality check used to compare the current vs. previous selector result is, by default, strict/reference equality, i.e. `===`. We can specify a different equality function if needed. The library provides `shallowEqual` for cases when the selector returns an object with top-level properties derived from the entity state, as in the example below:
+
+**MainView.js**
+```js
+import { useEntity, shallowEqual } from 'react-entities';
+
+const MainView = () => {
+  const [settings, settingsActions] = useEntity('settings', state => {
+    return {
+      theme: state.theme,
+      featureFlags: state.featureFlags
+    }
+  }, shallowEqual);
+  //      👆
+  return ( 
+    . . .
+  );
+};
+```
+
+In case you only require access to actions and not the entity state at all, you can use the selector `selectNone`. This selector always returns `null`.
+
+**Page.js**
+```js
+import { useEntity, selectNone } from 'react-entities';
+
+const Page = () => {
+  const [, { loadConfig }] = useEntity('settings', selectNone);
+  //                                                    👆
+  return ( 
+  //  . . .
+  );
+};
+```
+
+### Injecting dependencies into an entity
+
+We can separate reusable code like API calls, common business logic and utilities from our entity code. Instead of importing these _services_ directly into an entity, we can use _dependency injection_ to reduce coupling.
+
+This is achieved by pairing the entity with its dependencies as a tuple in the `entities` prop of the `<EntityScope>`.
+
+**App.js**
+```jsx
+import * as counter from './entities/counter';
+import * as settings from './entities/settings';
+import * as configService from './services/configService'; 
+
+const App = () => {
+  <EntityScope entities={{ 
+    counter,
+    settings: [settings, configService]  // 👈 
+  }}>
+    <CounterView />
+  </EntityScope>
+}
+```
+(TypeScript version is the same)
+
+This second argument is passed automatically as extra argument to our action composer function.
+
+**entities/settings.js**
+```js
+export const initialState = {
+  loading: false,
+  config: null
+};
+//                                      👇
+export const loadConfig = (settings, service) => async () => {
+  settings.setState({ loading: true });
+
+  const res = await service.fetchConfig();
+  settings.setState({ loading: false, config: res });
+};
+```
+
+In the example above, the `service` would be the `configService` passed via the entity scope.
 
 ### Multiple and nested entity scopes
 
@@ -206,7 +328,7 @@ const App = () => {
     <CounterView />
 
     <EntityScope entities={{ counter }}>
-        <SubCounterView />
+      <SubCounterView />
     </EntityScope>
   </EntityScope>
 }
@@ -214,4 +336,6 @@ const App = () => {
 (TypeScript version is the same)
 
 In our example above, `settings` is accessible to both `<CounterView>` and `<SubCounterView>`, while each of those components will "see" a different `counter`.
+
+The example is just illustrative, but in practice, multiple scopes are most useful if we do code-splitting. A lazy loaded module can have its own scope for entities that are needed only by that feature.
 

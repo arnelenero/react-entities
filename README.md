@@ -215,7 +215,7 @@ const Page = () => {
 };
 ```
 
-### Injecting dependencies into entities
+### Injecting dependencies into an entity
 
 Sometimes you would need to mock the API calls, for example, when unit testing your entities. In scenarios like these, you can take advantage of dependency injection. The `makeEntity` function accepts an optional second argument which is passed onto your entity.
 
