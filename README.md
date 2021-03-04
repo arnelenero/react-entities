@@ -56,16 +56,12 @@ import * as counter from './entities/counter';  // 👈
 import * as settings from './entities/settings';
 
 const App = () => {
-  <Header />
-
   <EntityScope entities={{ 
     counter,  // 👈 
     settings
   }}>
     <CounterView />
   </EntityScope>
-
-  <Footer />
 }
 ```
 
