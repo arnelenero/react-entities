@@ -63,7 +63,7 @@ import { Entity } from 'react-entities';
 
 /** Types **/
 
-export interface Counter {
+export interface Counter {  // 👈
   value: number;
 };
 
@@ -72,18 +72,19 @@ export interface CounterActions {
   decrement: (by: number) => void;
 };
 
-export type CounterEntity = Entity<Counter, CounterActions>;
+export type CounterEntity = Entity<Counter, CounterActions>;  // 👈
 
 /** Implementation **/
 
+//                           👇
 export const initialState: Counter = {
   value: 0
 };
-
+//                                      👇
 export const increment = (counter: CounterEntity) => (by: number) => {
   counter.setState({ value: counter.state.value + by });
 };
-
+//                                      👇
 export const decrement = (counter: CounterEntity) => (by: number) => {
   counter.setState({ value: counter.state.value - by });
 };
@@ -175,8 +176,9 @@ import { useEntity } from 'react-entities';
 import { Counter, CounterActions } from './entities/counter';
 
 export const CounterView = () => {
-  const [counter, { increment, decrement }] = useEntity<Counter, CounterActions>('counter');
-
+  const [counter, { increment, decrement }] = 
+    useEntity<Counter, CounterActions>('counter');
+    //           👆           👆 
   return (
     <>
       <div>{counter.value}</div>
@@ -203,54 +205,121 @@ By default, the `useEntity` hook binds the entire state of the entity to our com
 To circumvent this, we can pass a _selector_ function to the hook, as in this example:
 
 **MainView.js**
-```js
+```jsx
 import { useEntity } from 'react-entities';
 
 const MainView = () => {
   const [config, { loadConfig }] = useEntity('settings', state => state.config);
   //                                                           👆
   return ( 
-  //  . . .
+    //  . . .
   );
 };
 ```
+
+<details>
+  <summary>TypeScript version</summary><br/>
+
+**MainView.tsx**
+```tsx
+import { useEntity } from 'react-entities';
+import { Settings, Config, SettingsActions } from './entities/settings';
+
+const MainView = () => {
+  const [config, { loadConfig }] = 
+    useEntity<Config, SettingsActions>('settings', (state: Settings) => state.config);
+    //                                                               👆
+  return ( 
+    //  . . .
+  );
+```
+
+</details>
 
 Whenever the entity state is updated, the selector function is invoked to provide our component only the relevant data derived from the state. If the result of the selector is equal to the previous result, the component will not re-render.
 
 The equality check used to compare the current vs. previous selector result is, by default, strict/reference equality, i.e. `===`. We can specify a different equality function if needed. The library provides `shallowEqual` for cases when the selector returns an object with top-level properties derived from the entity state, as in the example below:
 
 **MainView.js**
-```js
+```jsx
 import { useEntity, shallowEqual } from 'react-entities';
 
 const MainView = () => {
   const [settings, settingsActions] = useEntity('settings', state => {
     return {
       theme: state.theme,
-      featureFlags: state.featureFlags
+      enableCountdown: state.featureFlags.countdown
     }
   }, shallowEqual);
   //      👆
   return ( 
-  //  . . .
+    //  . . .
   );
 };
 ```
 
+<details>
+  <summary>TypeScript version</summary><br/>
+
+**MainView.tsx**
+```tsx
+import { useEntity } from 'react-entities';
+import { Settings, Theme, SettingsActions } from './entities/settings';
+
+interface MainConfig {
+  theme: Theme;
+  enableCountdown: boolean;
+}
+
+const MainView = () => {
+  const [config, { loadConfig }] = 
+    useEntity<MainConfig, SettingsActions>('settings', (state: Settings) => {
+      return {
+        theme: state.theme,
+        enableCountdown: state.featureFlags.countdown
+      }
+    }, shallowEqual);
+    //      👆
+  return ( 
+    //  . . .
+  );
+```
+
+</details>
+
 In case you only require access to actions and not the entity state at all, you can use the selector `selectNone`. This selector always returns `null`.
 
 **Page.js**
-```js
+```jsx
 import { useEntity, selectNone } from 'react-entities';
 
 const Page = () => {
   const [, { loadConfig }] = useEntity('settings', selectNone);
   //                                                    👆
   return ( 
-  //  . . .
+    //  . . .
   );
 };
 ```
+
+<details>
+  <summary>TypeScript version</summary><br/>
+
+**Page.tsx**
+```tsx
+import { useEntity, selectNone } from 'react-entities';
+import { SettingsActions } from './entities/settings';
+
+const Page = () => {
+  const [, { loadConfig }] = 
+    useEntity<null, SettingsActions>('settings', selectNone);
+    //         👆                                     👆
+  return ( 
+    //  . . .
+  );
+```
+
+</details>
 
 ### Async actions
 
@@ -275,6 +344,45 @@ export const loadConfig = settings => async () => {
 };
 ```
 
+<details>
+  <summary>TypeScript version</summary><br/>
+
+**entities/settings.ts**
+```ts
+import { Entity } from 'react-entities';
+import { fetchConfig, Config } from './configService';
+
+/** Types **/
+
+export interface Settings {
+  loading: boolean;
+  config: Config;
+};
+
+export interface SettingsActions {
+  //                    👇
+  loadConfig: () => Promise<void>;
+};
+
+export type SettingsEntity = Entity<Settings, SettingsActions>;
+
+/** Implementation **/
+
+export const initialState: Settings = {
+  loading: false,
+  config: null
+};
+//                                                        👇
+export const loadConfig = (settings: SettingsEntity) => async () => {
+  settings.setState({ loading: true });
+
+  const res = await fetchConfig();
+  settings.setState({ loading: false, config: res });
+};                                   
+```
+
+</details>
+
 ### Calling other actions from an action
 
 An `actions` object is included in the entity reference that is passed onto actions, which allows them to call other actions, as in this example:
@@ -282,7 +390,7 @@ An `actions` object is included in the entity reference that is passed onto acti
 ```js
 export const loadAndApplyTheme = ui => async () => {
   const res = await fetchTheme();
-  //     👇
+  //    👇
   ui.actions.switchTheme(res);
 };
 
