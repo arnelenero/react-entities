@@ -391,7 +391,9 @@ export const loadConfig = (settings: SettingsEntity) => async () => {
 };                                   
 ```
 
-</details>
+</details><br />
+
+[⬆️ Recipes](#recipes)
 
 ### Calling other actions from an action
 
@@ -409,6 +411,8 @@ export const switchTheme = ui => theme => {
 }
 ```
 __Why not call `switchTheme` directly?__ Remember that the action definition here is a composer function, whereas the final composed action that we invoke at runtime is just a normal function.
+
+[⬆️ Recipes](#recipes)
 
 ### Injecting dependencies into an entity
 
@@ -453,6 +457,8 @@ export const loadConfig = (settings, service) => async () => {
 
 In the example above, the `service` would be the `configService` passed via the entity scope.
 
+[⬆️ Recipes](#recipes)
+
 ### Multiple and nested entity scopes
 
 It is simplest to have a single entity scope for all our entities at the top-level component. However, we can have any number of entity scopes, at different levels in our component tree. With nested scopes, entities in the outer scopes are passed down to the inner scopes.
@@ -479,6 +485,8 @@ const App = () => {
 In our example above, `settings` is accessible to both `<CounterView>` and `<SubCounterView>`, while each of those components will "see" a different `counter`.
 
 The example is just illustrative, but in practice, multiple scopes are most useful if we do code-splitting. A lazy loaded module can have its own scope for entities that are needed only by that feature.
+
+[⬆️ Recipes](#recipes)
 
 ### Separating "pure" state changes from actions
 
@@ -532,6 +540,8 @@ const updatePendingFlag = (state, pending) => {
 };
 ```
 
+[⬆️ Recipes](#recipes)
+
 ### Unit testing of entities
 
 When we unit test our entities, ideally we would isolate them from the components that use them. For this purpose, we can use the `createEntity` function. It creates an instance of the entity and returns a direct reference to it.
@@ -564,3 +574,5 @@ describe('counter', () => {
 ```
 
 In the example Jest unit test above, `createEntity` gives us the `counter` instance. This way, we are able to trigger an action in `counter.actions`, and then inspect the current state via `counter.state`. It also provides `counter.reset()` to allow us to reset the entity to its `initialState` before each test case is executed.
+
+[⬆️ Recipes](#recipes)
