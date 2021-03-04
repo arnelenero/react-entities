@@ -28,6 +28,66 @@ npm install react-entities
 ```
 
 
+## TLDR: Easy as 1-2-3
+
+__Step 1:__ Create an entity
+
+```js
+export const initialState = {
+  value: 0
+};
+
+export const increment = counter => by => {
+  counter.setState({ value: counter.state.value + by });
+};
+
+export const decrement = counter => by => {
+  counter.setState({ value: counter.state.value - by });
+};
+```
+
+__Step 2:__ Add the entity to a scope
+
+```jsx
+import { EntityScope } from 'react-entities';
+import * as counter from './entities/counter';  // 👈
+import * as settings from './entities/settings';
+
+const App = () => {
+  <Header />
+
+  <EntityScope entities={{ 
+    counter,  // 👈 
+    settings
+  }}>
+    <CounterView />
+  </EntityScope>
+
+  <Footer />
+}
+```
+
+__Step 3:__ Use the entity in components
+
+```jsx
+import { useEntity } from 'react-entities';
+
+export const CounterView = () => {
+  const [counter, { increment, decrement }] = useEntity('counter');
+
+  return (
+    <>
+      <div>{counter.value}</div>
+      <button onClick={() => increment(1)}>Increment</button>
+      <button onClick={() => decrement(1)}>Decrement</button>
+    </>
+  );
+};
+```
+
+It's that simple! 
+
+
 ## What is an Entity?
 
 An _entity_ is a single-concern data object whose _state_ can be bound to any number of components in the app as a "shared" state. Once bound to a component, an entity's state acts like local state, i.e. it causes the component to update on every change.
@@ -116,17 +176,21 @@ where `updates` is an object whose properties are __shallowly merged__ with the 
 
 ## Adding an Entity to a Scope
 
-Before we can access an entity in our components, we need to attach it to a _scope_. The `<EntityScope>` component propagates entities down its entire component subtree.
+Before we can access an entity in our components, we just need to attach it to a _scope_. The `<EntityScope>` component propagates entities down its entire component subtree.
 
 **App.js**
 ```jsx
 import { EntityScope } from 'react-entities';
-import * as counter from './entities/counter';
+import * as counter from './entities/counter';  // 👈
+import * as settings from './entities/settings';
 
 const App = () => {
   <Header />
 
-  <EntityScope entities={{ counter }}>
+  <EntityScope entities={{ 
+    counter,  // 👈 This is just shorthand for `counter: counter`
+    settings
+  }}>
     <CounterView />
   </EntityScope>
 
