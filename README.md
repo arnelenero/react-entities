@@ -198,6 +198,14 @@ With the very straightforward, largely unopinionated approach that React Entitie
 
 Here we provide some suggested patterns that you may consider for specific scenarios.
 
+[Binding only relevant data to a component](#binding-only-relevant-data-to-a-component)  
+[Async actions](#async-actions)  
+[Calling other actions from an action](#calling-other-actions-from-an-action)  
+[Injecting dependencies into an entity](#injecting-dependencies-into-an-entity)  
+[Multiple and nested entity scopes](#multiple-and-nested-entity-scopes)  
+[Separating "pure" state changes from actions](#separating-pure-state-changes-from-actions)  
+[Unit testing of entities](#unit-testing-of-entities)  
+
 ### Binding only relevant data to a component
 
 By default, the `useEntity` hook binds the entire state of the entity to our component. Changes made to any part of this state, even those that are not relevant to the component, would cause a re-render.
@@ -319,7 +327,9 @@ const Page = () => {
   );
 ```
 
-</details>
+</details><br />
+
+[⬆️ Recipes](#recipes)
 
 ### Async actions
 
