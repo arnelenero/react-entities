@@ -33,6 +33,8 @@ npm install react-entities
 __Step 1:__ Create an entity (shared state)
 
 ```js
+/** counter.js **/
+
 export const initialState = {
   value: 0
 };
