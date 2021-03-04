@@ -30,7 +30,7 @@ npm install react-entities
 
 ## TLDR: Easy as 1-2-3
 
-__Step 1:__ Create an entity
+__Step 1:__ Create an entity (shared state)
 
 ```js
 export const initialState = {
