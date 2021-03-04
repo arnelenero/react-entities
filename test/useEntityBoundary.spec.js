@@ -5,57 +5,46 @@ import { mount } from 'enzyme';
 import useEntityBoundary from '../src/useEntityBoundary';
 import makeEntity from '../src/makeEntity';
 
-let useEntityA = null;
-let useEntityB = null;
-let hookValueA = null;
-let hookValueB = null;
-let component = null;
-let mountCount = 0;
+describe('useEntityBoundary', () => {
+  const TestShell = () => {
+    useEntityBoundary();
 
-const TestShell = () => {
-  useEntityBoundary();
-
-  return <CounterView />;
-};
-
-const CounterView = () => {
-  hookValueA = useEntityA();
-  hookValueB = useEntityB();
-
-  useEffect(() => {
-    mountCount++;
-  }, []);
-
-  return null;
-};
-
-beforeAll(() => {
-  const initialState = {
-    value: 0,
+    return <CounterView />;
   };
 
+  const initialState = { value: 0 };
   const increment = counter => () => {
     counter.setState({ value: counter.state.value + 1 });
   };
-
   const decrement = counter => () => {
     counter.setState({ value: counter.state.value - 1 });
   };
+  const useEntityA = makeEntity({ initialState, increment });
+  const useEntityB = makeEntity({ initialState, decrement });
 
-  useEntityA = makeEntity({ initialState, increment });
-  useEntityB = makeEntity({ initialState, decrement });
-});
+  const CounterView = () => {
+    hookValueA = useEntityA();
+    hookValueB = useEntityB();
 
-beforeEach(() => {
-  component = mount(<TestShell />);
-});
+    useEffect(() => {
+      mountCount++;
+    }, []);
 
-afterEach(() => {
-  if (component.exists()) component.unmount();
-});
+    return null;
+  };
 
-describe('useEntityBoundary', () => {
+  let component = null;
+  let hookValueA = null;
+  let hookValueB = null;
+  let mountCount = 0;
+
+  afterEach(() => {
+    if (component.exists()) component.unmount();
+  });
+
   it('resets entities to initial state every time the component unmounts', () => {
+    component = mount(<TestShell />);
+
     const prevMountCount = mountCount;
     const { increment } = hookValueA[1];
     const { decrement } = hookValueB[1];

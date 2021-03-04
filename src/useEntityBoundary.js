@@ -5,8 +5,8 @@ import store from './store';
 export const useEntityBoundary = () => {
   useEffect(() => {
     return () => {
-      for (let entity in store) {
-        store[entity].reset();
+      for (let i = 0; i < store.length; i++) {
+        store[i].reset();
       }
     };
   }, []);
