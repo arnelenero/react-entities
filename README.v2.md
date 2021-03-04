@@ -100,14 +100,14 @@ The `initialState` defines the default state of the entity. This should always b
 In the example above, `increment` and `decrement` are both actions. Although actions are ultimately just normal functions, notice that they are defined using _higher-order functions_, or _composers_. This enables passing an entity reference to the action in its definition.
 
 This is the basic form of an action definition:
-```
+```js
 (entity) => (...arguments) => {}
 ```
 
 Within the action function, we can use the `state` property of the entity to refer to its current state. To make any changes to its state, we can use its `setState()` function. **Do not** directly mutate the `state` object.
 
 The function `setState()` has the following familiar form:
-```
+```js
 entity.setState(updates)
 ```
 where `updates` is an object whose properties are __shallowly merged__ with the current state, thus overriding the old values. 
@@ -192,29 +192,6 @@ With the very straightforward, largely unopinionated approach that React Entitie
 
 Here we provide some suggested patterns that you may consider for specific scenarios.
 
-### Async actions
-
-A typical action makes state changes then immediately terminates. However, since actions are just plain functions, they can contain any operations, including async ones. This gives us the flexibility of implementing things like async data fetches inside actions.
-
-Here is an example using `async/await` for async action:
-
-**entities/settings.js**
-```js
-import { fetchConfig } from './configService';
-
-export const initialState = {
-  loading: false,
-  config: null
-};
-//                                      👇
-export const loadConfig = settings => async () => {
-  settings.setState({ loading: true });
-
-  const res = await fetchConfig();
-  settings.setState({ loading: false, config: res });
-};
-```
-
 ### Binding only relevant data to a component
 
 By default, the `useEntity` hook binds the entire state of the entity to our component. Changes made to any part of this state, even those that are not relevant to the component, would cause a re-render.
@@ -270,6 +247,46 @@ const Page = () => {
   );
 };
 ```
+
+### Async actions
+
+A typical action makes state changes then immediately terminates. However, since actions are just plain functions, they can contain any operations, including async ones. This gives us the flexibility of implementing things like async data fetches inside actions.
+
+Here is an example using `async/await` for async action:
+
+**entities/settings.js**
+```js
+import { fetchConfig } from './configService';
+
+export const initialState = {
+  loading: false,
+  config: null
+};
+//                                      👇
+export const loadConfig = settings => async () => {
+  settings.setState({ loading: true });
+
+  const res = await fetchConfig();
+  settings.setState({ loading: false, config: res });
+};
+```
+
+### Calling other actions from an action
+
+An `actions` object is included in the entity reference that is passed onto actions, which allows them to call other actions, as in this example:
+
+```js
+export const loadAndApplyTheme = ui => async () => {
+  const res = await fetchTheme();
+  //     👇
+  ui.actions.switchTheme(res);
+};
+
+export const switchTheme = ui => theme => {
+  ui.setState({ theme });
+}
+```
+__Why not call `switchTheme` directly?__ Remember that the action definition here is a composer function, whereas the final composed action that we invoke at runtime is just a normal function.
 
 ### Injecting dependencies into an entity
 
@@ -341,3 +358,54 @@ In our example above, `settings` is accessible to both `<CounterView>` and `<Sub
 
 The example is just illustrative, but in practice, multiple scopes are most useful if we do code-splitting. A lazy loaded module can have its own scope for entities that are needed only by that feature.
 
+### Separating "pure" state changes from actions
+
+Using _pure functions_ for updating state has its benefits. Since an entity action can be pretty much any function, it does not automatically prevent _side effects_.
+
+To allow us to separate "pure" state updates, `setState()` can accept an _updater function_ with the following form:
+```js
+updaterFn(state, ...args) => changes
+```
+where `state` is the current state and the optional `args` can be any number of arguments. This function returns the changes that will be __shallowly merged__ with the current state by `setState()`.
+
+The `setState()` call inside actions will then have to be in this form: 
+```js
+setState(updaterFn, ...updaterArgs)
+```
+
+In the example below, we can see that this pattern gives us the benefits of pure functions: readability, predictability and reusability among others.
+
+```js
+export const signIn = (auth, service) => async (email, password) => {
+  auth.setState(updatePendingFlag, true);
+
+  const { userId, role } = await service.signIn(email, password);
+  auth.setState(updateAuth, userId, role);
+};
+
+/*** State Updaters ***/
+
+const updateAuth = (state, userId, role) => {
+  return { userId, role, isAuthPending: false };
+};
+
+const updatePendingFlag = (state, pending) => {
+  return { isAuthPending: pending };
+};
+```
+
+Pure state updaters can also be nested to encourage modularity, like in this example:
+
+```js
+const updateAuth = (state, userId, role) => {
+  return { 
+    userId, 
+    role, 
+    ...updatePendingFlag(state, false)     // 👈
+  };
+};
+
+const updatePendingFlag = (state, pending) => {
+  return { isAuthPending: pending };
+};
+```
