@@ -1,4 +1,4 @@
-import createEntity from '../src/createEntity';
+import createEntity from '../createEntity';
 
 describe('createEntity', () => {
   it('returns an entity instance', () => {

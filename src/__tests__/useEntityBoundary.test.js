@@ -2,8 +2,8 @@ import React, { useEffect } from 'react';
 import { act } from 'react-dom/test-utils';
 import { mount } from 'enzyme';
 
-import useEntityBoundary from '../src/useEntityBoundary';
-import makeEntity from '../src/makeEntity';
+import useEntityBoundary from '../useEntityBoundary';
+import makeEntity from '../makeEntity';
 
 describe('useEntityBoundary', () => {
   const TestShell = () => {

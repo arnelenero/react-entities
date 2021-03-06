@@ -1,8 +1,8 @@
 import React from 'react';
 import { mount } from 'enzyme';
 
-import EntityScope from '../src/EntityScope';
-import useEntity from '../src/useEntity';
+import EntityScope from '../EntityScope';
+import useEntity from '../useEntity';
 
 describe('EntityScope', () => {
   const counter = {

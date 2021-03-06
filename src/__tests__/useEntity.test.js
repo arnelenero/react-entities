@@ -2,9 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { act } from 'react-dom/test-utils';
 import { mount } from 'enzyme';
 
-import useEntity from '../src/useEntity';
-import EntityScope from '../src/EntityScope';
-import { shallowEqual } from '../src/utils';
+import useEntity from '../useEntity';
+import EntityScope from '../EntityScope';
+import { shallowEqual } from '../utils';
 
 describe('useEntity', () => {
   const counter = {

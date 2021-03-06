@@ -9,21 +9,21 @@
     "functional",
     "hooks"
   ],
+  "repository": "github:arnelenero/react-entities",
   "author": "Arnel Enero <aenero@gmail.com>",
   "license": "MIT",
-  "repository": "github:arnelenero/react-entities",
+  "homepage": "https://arnelenero.github.io/react-entities/",
   "main": "lib/index.js",
   "module": "es/index.js",
   "typings": "./index.d.ts",
   "files": [
     "lib",
     "es",
-    "src",
     "index.d.ts"
   ],
   "scripts": {
-    "build:lib": "cross-env BABEL_ENV=commonjs babel src --out-dir lib",
-    "build:es": "babel src --out-dir es",
+    "build:lib": "cross-env BABEL_ENV=commonjs babel src --out-dir lib --ignore **/__tests__",
+    "build:es": "babel src --out-dir es --ignore **/__tests__",
     "build": "npm run build:lib && npm run build:es",
     "clean": "rimraf lib es",
     "prepare": "npm run clean && npm test",
@@ -69,9 +69,8 @@
     "sinon": "^7.5.0"
   },
   "jest": {
-    "testRegex": "(/test/.*\\.spec\\.js)$",
     "setupFilesAfterEnv": [
-      "<rootDir>/test/_setup.js"
+      "<rootDir>/test-setup.js"
     ],
     "collectCoverageFrom": [
       "src/**/*.js",

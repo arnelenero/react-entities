@@ -1,7 +1,7 @@
 import React from 'react';
 import { mount } from 'enzyme';
 
-import makeEntity from '../src/makeEntity';
+import makeEntity from '../makeEntity';
 
 describe('makeEntity', () => {
   const counter = {

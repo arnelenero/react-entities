@@ -1,4 +1,4 @@
-import { selectAll, selectNone, strictEqual, shallowEqual } from '../src/utils';
+import { selectAll, selectNone, strictEqual, shallowEqual } from '../utils';
 
 describe('selectAll', () => {
   it('returns the exact object', () => {
