@@ -5,7 +5,7 @@
 [![coverage](https://img.shields.io/coveralls/github/arnelenero/react-entities)](https://coveralls.io/github/arnelenero/react-entities)
 [![license](https://img.shields.io/github/license/arnelenero/react-entities)](https://opensource.org/licenses/MIT)
 
-React Entities is an ultra-lightweight library that provides the simplest state management for React apps. It takes advantage of React Hooks.
+React Entities is an ultra-lightweight library that provides simplified state management for React apps. It takes advantage of React Hooks.
 
 ## Why React Entities?
 
