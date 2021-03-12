@@ -1,4 +1,4 @@
-# <img src="doc/logo.png" alt="React Entities" width="200"/>
+# <img src="https://arnelenero.github.io/react-entities/doc/logo.png" alt="React Entities" width="200"/>
 
 [![npm](https://img.shields.io/npm/v/react-entities)](https://www.npmjs.com/package/react-entities)
 [![build](https://img.shields.io/travis/arnelenero/react-entities)](https://travis-ci.org/github/arnelenero/react-entities)
